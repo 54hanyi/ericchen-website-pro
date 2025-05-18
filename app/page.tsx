@@ -1,18 +1,33 @@
-import Link from 'next/link';
+'use client'
+
+import Link from 'next/link'
+import { Typewriter } from 'react-simple-typewriter'
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-black text-white font-sans">
-      {/* Hero Section */}
       <section className="h-screen flex flex-col items-center justify-center text-center px-4">
-        <h1 className="text-5xl md:text-7xl font-bold mb-4 animate-fadeInUp">
-          Eric Chen
+        <h1 className="text-5xl md:text-7xl font-bold mb-4 animate-fade-in-up">
+          Hi, 我是 <span className="text-cyan-400">Eric</span>
         </h1>
-        <p className="text-xl md:text-2xl text-gray-400 mb-8 animate-fadeInUp delay-100">
-          Front-End Developer · React · TypeScript · Next.js
+
+        <p className="text-xl md:text-2xl text-cyan-300 mb-6 animate-fade-in-up delay-100">
+          <Typewriter
+            words={['A Front-End Developer, React Enthusiast, Next.js Builder']}
+            loop={1}
+            cursor
+            cursorStyle="_"
+            typeSpeed={88}
+            deleteSpeed={50}
+            delaySpeed={1000}
+          />
         </p>
-        <div className="animate-fadeInUp delay-200">
-          <Link href="#projects" className="px-6 py-3 border border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black transition rounded-xl">
+
+        <div className="animate-fade-in-up delay-200">
+          <Link
+            href="/projects"
+            className="px-6 py-3 border border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black transition rounded-xl"
+          >
             查看我的作品
           </Link>
         </div>
