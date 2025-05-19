@@ -1,6 +1,5 @@
 /* ✅ 使用新版 Tailwind v4 的 import 寫法 */
-@import "tailwindcss/preflight";
-@import "tailwindcss/utilities";
+@import 'tailwindcss';
 
 /* ✅ 自訂 CSS 變數與樣式 */
 :root {
