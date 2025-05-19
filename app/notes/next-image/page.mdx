@@ -1,0 +1,16 @@
+export const metadata = {
+  title: "Next.js 圖片無法顯示的解法",
+  description: "部署後圖片不見？你需要加上 image domains！",
+  tags: ["next.js", "image", "deploy", "bug"],
+};
+
+# Next.js 圖片無法顯示的解法
+
+部署後圖片不見？通常原因是你沒在 `next.config.js` 設定 `images.domains`！
+
+```js
+// next.config.mjs
+images: {
+  domains: ['images.unsplash.com'],
+}
+```
