@@ -1,14 +1,14 @@
 import path from 'path'
 import fs from 'fs/promises'
-import { type Metadata } from 'next'
 
-// 你可以依照需要加欄位（如 date）
-type NoteMeta = Metadata & {
+
+export type NoteMeta = {
+  title: string
+  description: string
+  tags: string[]
   slug: string
-  tags?: string[]
 }
 
-// 讀取 app/notes 目錄下的所有筆記 metadata
 export async function getAllNotes(): Promise<NoteMeta[]> {
   const notesDir = path.join(process.cwd(), 'app/notes')
   const dirs = await fs.readdir(notesDir)
@@ -21,11 +21,12 @@ export async function getAllNotes(): Promise<NoteMeta[]> {
     try {
       const mod = await import(`../../app/notes/${dir}/page.mdx`)
       const metadata = mod.metadata || {}
+
       notes.push({
         slug: dir,
-        title: metadata.title || '',
-        description: metadata.description || '',
-        tags: metadata.tags || [],
+        title: String(metadata.title || ''),
+        description: String(metadata.description || ''),
+        tags: Array.isArray(metadata.tags) ? metadata.tags : [],
       })
     } catch (err) {
       console.warn(`❗ 無法讀取 ${filePath}`, err)
