@@ -43,9 +43,13 @@ export default async function NotePage({
         {metadata.tags?.length > 0 && (
           <div className="mt-2 mb-4 flex gap-2 flex-wrap text-xs text-cyan-300">
             {metadata.tags.map((tag) => (
-              <span key={tag} className="bg-cyan-900 px-2 py-1 rounded">
+              <Link
+                key={tag}
+                href={`/tags/${tag}`}
+                className="bg-cyan-900 px-2 py-1 rounded hover:underline"
+              >
                 #{tag}
-              </span>
+              </Link>
             ))}
           </div>
         )}
