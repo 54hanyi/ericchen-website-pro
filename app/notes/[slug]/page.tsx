@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { type Metadata } from 'next'
 import { type NoteMeta } from '@/utils/getAllNotes'
+import { getAllNotes } from '@/utils/getAllNotes'
 
 export async function generateMetadata({
   params,
@@ -29,6 +30,11 @@ export default async function NotePage({
     const Post = post.default // post.default 將整篇文章轉成的 React 元件
     const metadata: NoteMeta = post.metadata
 
+    const notes = await getAllNotes()
+    const currentIndex = notes.findIndex((n) => n.slug === params.slug)
+    const prev = notes[currentIndex - 1]
+    const next = notes[currentIndex + 1]
+
     return (
       <article className="prose prose-invert dark:prose-invert max-w-3xl mx-auto px-6 py-12">
         <Link
@@ -55,6 +61,21 @@ export default async function NotePage({
         )}
 
         <Post />
+
+        {/* ✅ 上一篇 / 下一篇區塊 */}
+        <div className="mt-12 pt-6 border-t border-gray-700 flex justify-between text-sm text-cyan-400">
+          {prev ? (
+            <Link href={`/notes/${prev.slug}`} className="hover:underline">
+              ← 上一篇：{prev.title}
+            </Link>
+          ) : <div />}
+
+          {next ? (
+            <Link href={`/notes/${next.slug}`} className="hover:underline ml-auto">
+              下一篇：{next.title} →
+            </Link>
+          ) : <div />}
+        </div>
       </article>
     )
   } catch {
