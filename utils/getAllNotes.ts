@@ -1,37 +1,40 @@
 import path from 'path'
 import fs from 'fs/promises'
-import { type Metadata } from 'next'
 
-export type NoteMeta = Metadata & {
+export type NoteMeta = {
   slug: string
+  title: string
+  description: string
   tags?: string[]
 }
 
 export async function getAllNotes(): Promise<NoteMeta[]> {
   const notesDir = path.join(process.cwd(), 'app/notes')
-  const entries = await fs.readdir(notesDir, { withFileTypes: true })
+  const dirs = await fs.readdir(notesDir, { withFileTypes: true })
 
   const notes: NoteMeta[] = []
 
-  for (const entry of entries) {
-    // ✅ 跳過非目錄（只讀資料夾）且排除動態路由 [slug]
-    if (!entry.isDirectory() || entry.name.startsWith('[')) continue
+  for (const dir of dirs) {
+    if (!dir.isDirectory() || dir.name.startsWith('[')) continue
 
-    const slug = entry.name
-    const filePath = path.join(notesDir, slug, 'page.mdx')
+    const mdxPath = path.join(notesDir, dir.name, 'page.mdx')
+    const file = await fs.readFile(mdxPath, 'utf-8')
 
+    // ✅ 手動解析 metadata（簡單實作：取出前 10 行內 export const metadata = {...}）
+    const metaMatch = file.match(/export const metadata = ({[\s\S]*?})/)
+    if (!metaMatch) continue
+
+    const metadataStr = metaMatch[1]
     try {
-      const mod = await import(`../../app/notes/${slug}/page.mdx`)
-      const metadata = mod.metadata || {}
-
+      const metadata = eval(`(${metadataStr})`) // ⚠️ 安全性考量下次優化
       notes.push({
-        slug,
-        title: metadata.title || '',
-        description: metadata.description || '',
-        tags: metadata.tags || [],
+        slug: dir.name,
+        title: String(metadata.title ?? ''),
+        description: String(metadata.description ?? ''),
+        tags: metadata.tags ?? [],
       })
-    } catch (err) {
-      console.warn(`❗ 無法讀取 ${filePath}`, err)
+    } catch (e) {
+      console.warn(`⚠️ metadata 無法解析：${dir.name}`, e)
     }
   }
 

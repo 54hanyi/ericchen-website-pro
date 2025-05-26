@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 export default async function NotesPage() {
   const notes = await getAllNotes()
+  console.log('🧪 notes:', notes)
 
   return (
     <section className="max-w-3xl mx-auto px-6 py-12">
