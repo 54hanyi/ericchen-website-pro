@@ -4,6 +4,7 @@ import { type Metadata } from 'next'
 import { type NoteMeta } from '@/utils/getAllNotes'
 import { getAllNotes } from '@/utils/getAllNotes'
 
+
 export async function generateMetadata({
   params,
 }: {
@@ -12,8 +13,8 @@ export async function generateMetadata({
   try {
     const post: { metadata: NoteMeta } = await import(`../${params.slug}/page.mdx`)
     return {
-      title: post.metadata.title,
-      description: post.metadata.description,
+      title: post.metadata.title ?? '',
+      description: post.metadata.description ?? '',
     }
   } catch {
     return {}
@@ -27,7 +28,7 @@ export default async function NotePage({
 }) {
   try {
     const post = await import(`../${params.slug}/page.mdx`)
-    const Post = post.default // post.default 將整篇文章轉成的 React 元件
+    const Post = post.default
     const metadata: NoteMeta = post.metadata
 
     const notes = await getAllNotes()
@@ -41,20 +42,20 @@ export default async function NotePage({
           href="/notes"
           className="no-underline text-sm text-cyan-400 hover:underline block mb-4"
         >
-          ← 回到小筆記總覽
+          {'← 回到小筆記總覽'}
         </Link>
 
-        <h1 className="text-3xl font-bold">{metadata.title}</h1>
+        <h1 className="text-3xl font-bold">{String(metadata.title ?? '')}</h1>
 
-        {metadata.tags?.length > 0 && (
+        {Array.isArray(metadata.tags) && metadata.tags.length > 0 && (
           <div className="mt-2 mb-4 flex gap-2 flex-wrap text-xs text-cyan-300">
-            {metadata.tags.map((tag) => (
+            {metadata.tags.map((tag: string) => (
               <Link
                 key={tag}
                 href={`/tags/${tag}`}
                 className="bg-cyan-900 px-2 py-1 rounded hover:underline"
               >
-                #{tag}
+                {'#' + tag}
               </Link>
             ))}
           </div>
@@ -66,13 +67,13 @@ export default async function NotePage({
         <div className="mt-12 pt-6 border-t border-gray-700 flex justify-between text-sm text-cyan-400">
           {prev ? (
             <Link href={`/notes/${prev.slug}`} className="hover:underline">
-              ← 上一篇：{prev.title}
+              {'← 上一篇：' + String(prev.title ?? '')}
             </Link>
           ) : <div />}
 
           {next ? (
             <Link href={`/notes/${next.slug}`} className="hover:underline ml-auto">
-              下一篇：{next.title} →
+              {'下一篇：' + String(next.title ?? '') + ' →'}
             </Link>
           ) : <div />}
         </div>
