@@ -6,6 +6,7 @@ export type NoteMeta = {
   title: string
   description: string
   tags?: string[]
+  date?: string
 }
 
 export async function getAllNotes(): Promise<NoteMeta[]> {
@@ -20,7 +21,6 @@ export async function getAllNotes(): Promise<NoteMeta[]> {
     const mdxPath = path.join(notesDir, dir.name, 'page.mdx')
     const file = await fs.readFile(mdxPath, 'utf-8')
 
-    // ✅ 手動解析 metadata（簡單實作：取出前 10 行內 export const metadata = {...}）
     const metaMatch = file.match(/export const metadata = ({[\s\S]*?})/)
     if (!metaMatch) continue
 
@@ -32,11 +32,14 @@ export async function getAllNotes(): Promise<NoteMeta[]> {
         title: String(metadata.title ?? ''),
         description: String(metadata.description ?? ''),
         tags: metadata.tags ?? [],
+        date: metadata.date ?? '2025-05-20',
       })
     } catch (e) {
       console.warn(`⚠️ metadata 無法解析：${dir.name}`, e)
     }
   }
 
+  notes.sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+  
   return notes
 }
