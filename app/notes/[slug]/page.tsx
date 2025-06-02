@@ -1,4 +1,3 @@
-// app/notes/[slug]/page.tsx
 export const dynamic = 'force-dynamic'
 
 import { notFound } from 'next/navigation'
