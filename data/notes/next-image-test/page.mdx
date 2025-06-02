@@ -1,16 +1,166 @@
 ---
+title: "MDX 筆記系統開發血淚史：從 import 到 compileMDX"
+description: "記錄我如何從傳統 import 模組，轉成用 compileMDX 解析 Frontmatter，解決 Next.js App Router 的坑。"
+tags: ["next.js", "MDX", "compileMDX", "App Router", "血淚史"]
+date: "2025-06-02"
+---
+
+# MDX 筆記系統開發血淚史：從 `import` 到 `compileMDX`
+
+---
+
+打造自己的 **MDX 筆記系統**，一直是我的目標。
+
+這次記錄下這段開發過程中，從踩坑到解決問題的血淚歷程，順便作為未來的自己或他人參考。
+
+---
+
+## 🚩 問題背景
+
+功能需求：
+
+- 筆記列表能顯示所有筆記
+- 每篇筆記能點進去瀏覽詳細內容
+- 支援 **上一篇 / 下一篇** 快速瀏覽
+- 每篇筆記需有 `title`、`description`、`tags`、`date` 等欄位
+
+---
+
+## 🚫 一開始採用的做法
+
+當時的筆記檔案格式是這樣：
+
+```tsx
+export const metadata = {
+  title: "深入理解 useEffect",
+  description: "這篇文章帶你一次釐清 useEffect 的所有依賴陷阱與正確用法。",
+  tags: ["react", "useEffect", "hook"],
+  date: "2024-05-26",
+};
+```
+
+搭配這樣的動態 import 方式載入：
+
+```tsx
+const post = await import(`../${params.slug}/page.mdx`);
+```
+
+---
+
+## ⚠️ 遇到的問題
+
+這種做法在 Next.js App Router (`next 13/14/15`) + RSC 環境下遇到致命問題：
+
+- ❌ **RSC 不允許 `import()` 動態讀取檔案**
+- ❌ `params` 是 Async 的，取值需要 `await`
+- ❌ `import()` 會讓 build 卡死，無法預渲染
+- ❌ metadata 無法正確讀取，筆記列表出現空白
+
+---
+
+## 🚑 解法 — 改用 `compileMDX`
+
+1. **改用 `next-mdx-remote/rsc`**  
+   官方推薦的新做法，透過 `compileMDX` 來解析 MDX：
+
+```tsx
+import { compileMDX } from "next-mdx-remote/rsc";
+
+const { frontmatter } = await compileMDX({
+  source: file,
+  options: { parseFrontmatter: true },
+});
+```
+
+這樣可以：
+
+- ✅ 直接解析 Frontmatter
+- ✅ 支援 RSC
+- ✅ 無需動態 `import`，避免 build 卡死
+
+2. **調整 MDX 格式**
+
+筆記檔案改用 YAML Frontmatter，格式變成這樣：
+
+````mdx
+---
 title: "Next.js 圖片無法顯示的解法"
 description: "部署後圖片不見？你需要加上 image domains！"
 tags: ["next.js", "image", "deploy", "bug"]
-date: "2024-05-15"
+date: "2024-05-25"
 ---
 
 # Next.js 圖片無法顯示的解法
 
-部署後圖片不見？通常原因是你沒在 `next.config.js` 設定 `images.domains`！
+部署後圖片不見？通常是因為你沒設定 `images.domains`。
 
 ```js
 images: {
-  domains: ['images.unsplash.com'],
+  domains: ["images.unsplash.com"],
 }
 ```
+````
+
+````
+
+---
+
+## 🔨 修改 `getAllNotes`
+
+遍歷資料夾 `data/notes/{slug}/page.mdx`，每個檔案用 `compileMDX` 解析 Frontmatter：
+
+```tsx
+const { frontmatter } = await compileMDX({
+  source: file,
+  options: { parseFrontmatter: true },
+});
+````
+
+並整理成這個型別：
+
+```tsx
+type NoteMeta = {
+  slug: string;
+  title: string;
+  description: string;
+  tags?: string[];
+  date?: string;
+};
+```
+
+再依照 `date` 排序，讓最新的文章顯示在最前面。
+
+---
+
+## 🔧 修改 `generateMetadata`
+
+不再用 `import()`，直接從 MDX Frontmatter 取資料：
+
+```tsx
+const { frontmatter } = await compileMDX({
+  source,
+  options: { parseFrontmatter: true },
+});
+
+return {
+  title: frontmatter.title,
+  description: frontmatter.description,
+};
+```
+
+---
+
+## 🎉 最終成果
+
+- ✅ 筆記列表正確顯示 `title`、`description`
+- ✅ 筆記內容渲染正常
+- ✅ 上一篇、下一篇連結順利運作
+- ✅ 筆記數量可以統計
+
+---
+
+## ✍️ 小結
+
+這次的踩坑與修正讓我真正理解 **App Router** 的限制，以及 **MDX** 與 **Frontmatter** 的處理方式。
+
+如果你也想自己做一套小型部落格或筆記系統，希望這份筆記對你有幫助！
