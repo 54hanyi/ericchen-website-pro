@@ -1,0 +1,16 @@
+---
+title: "Next.js 圖片無法顯示的解法"
+description: "部署後圖片不見？你需要加上 image domains！"
+tags: ["next.js", "image", "deploy", "bug"]
+date: "2024-05-28"
+---
+
+# Next.js 圖片無法顯示的解法
+
+部署後圖片不見？通常原因是你沒在 `next.config.js` 設定 `images.domains`！
+
+```js
+images: {
+  domains: ['images.unsplash.com'],
+}
+```

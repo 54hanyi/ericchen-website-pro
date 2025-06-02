@@ -1,5 +1,6 @@
 import path from 'path'
 import fs from 'fs/promises'
+import { compileMDX } from 'next-mdx-remote/rsc'
 
 export type NoteMeta = {
   slug: string
@@ -10,36 +11,44 @@ export type NoteMeta = {
 }
 
 export async function getAllNotes(): Promise<NoteMeta[]> {
-  const notesDir = path.join(process.cwd(), 'app/notes')
-  const dirs = await fs.readdir(notesDir, { withFileTypes: true })
+  const notesDir = path.join(process.cwd(), 'data/notes')  
+  const dirs = await fs.readdir(notesDir)
 
   const notes: NoteMeta[] = []
 
-  for (const dir of dirs) {
-    if (!dir.isDirectory() || dir.name.startsWith('[')) continue
+  for (const dirName of dirs) {
+    const mdxPath = path.join(notesDir, dirName, 'page.mdx')
 
-    const mdxPath = path.join(notesDir, dir.name, 'page.mdx')
-    const file = await fs.readFile(mdxPath, 'utf-8')
-
-    const metaMatch = file.match(/export const metadata = ({[\s\S]*?})/)
-    if (!metaMatch) continue
-
-    const metadataStr = metaMatch[1]
     try {
-      const metadata = eval(`(${metadataStr})`) // ⚠️ 安全性考量下次優化
-      notes.push({
-        slug: dir.name,
-        title: String(metadata.title ?? ''),
-        description: String(metadata.description ?? ''),
-        tags: metadata.tags ?? [],
-        date: metadata.date ?? '2025-05-20',
+      const file = await fs.readFile(mdxPath, 'utf-8')
+
+      const { frontmatter } = await compileMDX<{
+        title: string
+        description: string
+        tags?: string[]
+        date?: string
+      }>({
+        source: file,
+        options: { parseFrontmatter: true },
       })
-    } catch (e) {
-      console.warn(`⚠️ metadata 無法解析：${dir.name}`, e)
+
+      notes.push({
+        slug: dirName,
+        title: String(frontmatter.title ?? ''),
+        description: String(frontmatter.description ?? ''),
+        tags: frontmatter.tags ?? [],
+        date: frontmatter.date ?? '1998-04-01',
+      })
+    } catch (err) {
+      console.warn(`⚠️ 解析失敗，跳過 ${dirName}`, err)
+      continue
     }
   }
 
-  notes.sort((a, b) => (b.date || '').localeCompare(a.date || ''))
-  
+  // 按照日期排序
+  notes.sort((a, b) => {
+    return new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime()
+  })
+
   return notes
 }
