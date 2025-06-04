@@ -4,15 +4,16 @@ import Link from 'next/link'
 export const dynamic = 'force-dynamic' 
 
 export default async function TagPage({ params }: { params: { tag: string } }) {
-  const { tag } = params
   const allNotes = await getAllNotes()
+  const decodedTag = decodeURIComponent(params.tag) //解碼成中文
+  
   const filteredNotes = allNotes.filter((note) =>
-    Array.isArray(note.tags) && note.tags.includes(tag)
+    Array.isArray(note.tags) && note?.tags?.includes(decodedTag)
   )
 
   return (
     <section className="max-w-3xl mx-auto px-6 py-12">
-      <h1 className="text-3xl font-bold mb-8">#️⃣ 標籤：{tag}</h1>
+      <h1 className="text-3xl font-bold mb-8">#️⃣ 標籤：{decodedTag}</h1>
       <p className="text-gray-400 mb-8">{filteredNotes.length} 篇筆記</p>
 
       {filteredNotes.length === 0 ? (

@@ -6,6 +6,8 @@ import { compileMDX } from 'next-mdx-remote/rsc'
 import { getAllNotes } from '@/utils/getAllNotes'
 import path from 'path'
 import fs from 'fs/promises'
+import readingTime from 'reading-time'
+import { format } from 'date-fns'
 
 export async function generateStaticParams() {
   const notes = await getAllNotes()
@@ -50,6 +52,9 @@ export default async function NotePage({ params }: { params: { slug: string } })
       options: { parseFrontmatter: true },
     })
 
+    const stats = readingTime(source)
+    const chineseReadingTime = `${Math.ceil(stats.minutes)} 分鐘閱讀`
+
     const notes = await getAllNotes()
     const currentIndex = notes.findIndex((n) => n.slug === slug)
     const prev = notes[currentIndex - 1] ?? null
@@ -63,6 +68,18 @@ export default async function NotePage({ params }: { params: { slug: string } })
 
         <h1 className="text-3xl font-bold">{String(frontmatter.title ?? '')}</h1>
 
+        {/* 日期與閱讀時間 */}
+        <div className="flex items-center text-gray-400 text-sm space-x-2 mt-2">
+          <span>{format(new Date(frontmatter.date || ''), 'yyyy 年 MM 月 dd 日')}</span>
+          {chineseReadingTime && (
+            <>
+              <span className="text-xs text-gray-500">•</span>
+              <span>{chineseReadingTime}</span>
+            </>
+          )}
+        </div>
+
+        {/* 標籤 */}
         {Array.isArray(frontmatter.tags) && frontmatter.tags.length > 0 && (
           <div className="mt-2 mb-4 flex gap-2 flex-wrap text-xs text-cyan-300">
             {frontmatter.tags.map((tag) => (
@@ -73,7 +90,7 @@ export default async function NotePage({ params }: { params: { slug: string } })
           </div>
         )}
 
-        {/* 🔥 這裡渲染正文 */}
+        {/* 正文內容 */}
         <div>{content}</div>
 
         {/* 上一篇 / 下一篇 */}
@@ -83,7 +100,6 @@ export default async function NotePage({ params }: { params: { slug: string } })
               {'← 上一篇：' + String(prev.title ?? '')}
             </Link>
           ) : <div />}
-
           {next ? (
             <Link href={`/notes/${next.slug}`} className="hover:underline ml-auto">
               {'下一篇：' + String(next.title ?? '') + ' →'}
