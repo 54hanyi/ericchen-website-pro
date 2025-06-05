@@ -1,0 +1,61 @@
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  overflow: hidden;
+}
+
+.background {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(-45deg, #0f172a, #1e293b, #0f172a, #0e1117);
+  background-size: 400% 400%;
+  animation: gradient 8s ease infinite;
+  z-index: 0;
+}
+
+.gradient {
+  animation: gradient 8s ease infinite;
+}
+
+.meteor {
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  width: 2px;
+  height: 100px;
+  background: linear-gradient(180deg, transparent, white, transparent);
+  animation: meteor 2s linear infinite;
+  pointer-events: none;
+}
+
+.glowText {
+  filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.7));
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes meteor {
+  0% {
+    transform: translateX(0) translateY(0) rotate(45deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-100vw) translateY(100vh) rotate(45deg);
+    opacity: 0;
+  }
+}
