@@ -22,6 +22,10 @@
   animation: gradient 8s ease infinite;
 }
 
+.glowText {
+  filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.7));
+}
+
 .meteor {
   position: absolute;
   top: -50px;
@@ -33,8 +37,28 @@
   pointer-events: none;
 }
 
-.glowText {
-  filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.7));
+/* 流星的隨機性 */
+.meteor:nth-child(1) { left: 20%; animation-duration: 2s; }
+.meteor:nth-child(2) { left: 40%; animation-duration: 3s; }
+.meteor:nth-child(3) { left: 60%; animation-duration: 2.5s; }
+.meteor:nth-child(4) { left: 80%; animation-duration: 3.5s; }
+.meteor:nth-child(5) { left: 25%; animation-duration: 2.2s; }
+.meteor:nth-child(6) { left: 50%; animation-duration: 3.2s; }
+.meteor:nth-child(7) { left: 70%; animation-duration: 2.8s; }
+.meteor:nth-child(8) { left: 85%; animation-duration: 3.1s; }
+.meteor:nth-child(9) { left: 15%; animation-duration: 2.4s; }
+.meteor:nth-child(10) { left: 35%; animation-duration: 3.4s; }
+
+
+@keyframes meteor {
+  0% {
+    transform: translateX(0) translateY(0) rotate(45deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-100vw) translateY(100vh) rotate(45deg);
+    opacity: 0;
+  }
 }
 
 @keyframes gradient {
@@ -46,16 +70,5 @@
   }
   100% {
     background-position: 0% 50%;
-  }
-}
-
-@keyframes meteor {
-  0% {
-    transform: translateX(0) translateY(0) rotate(45deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(-100vw) translateY(100vh) rotate(45deg);
-    opacity: 0;
   }
 }

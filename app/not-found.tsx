@@ -7,6 +7,10 @@ import styles from './not-found.module.css'
 export default function NotFoundPage() {
   const [countdown, setCountdown] = useState(5)
 
+  const meteors = Array.from({ length: 10 }, (_, i) => (
+    <div key={i} className={styles.meteor}></div>
+  ))
+
   useEffect(() => {
     if (countdown === 0) {
       window.location.href = '/'
@@ -26,7 +30,7 @@ export default function NotFoundPage() {
       <div className={styles.background}></div>
 
       {/* 流星 */}
-      <div className={styles.meteor}></div>
+      {meteors}
 
       {/* 內容 */}
       <section className="z-10 text-white px-6">

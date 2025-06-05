@@ -13,9 +13,13 @@ type Note = {
 
 export default function SearchNotes({ notes }: { notes: Note[] }) {
   const [search, setSearch] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const notesPerPage = 5
+
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // 聚焦搜尋文字
+  // 🔍 搜尋高亮
   const highlightText = (text: string, keyword: string) => {
     if (!keyword) return text
     const parts = text.split(new RegExp(`(${keyword})`, 'gi'))
@@ -37,17 +41,36 @@ export default function SearchNotes({ notes }: { notes: Note[] }) {
     )
   })
 
+  const totalPages = Math.ceil(filteredNotes.length / notesPerPage)
+
+  // 分頁後的筆記
+  const paginatedNotes = filteredNotes.slice(
+    (currentPage - 1) * notesPerPage,
+    currentPage * notesPerPage
+  )
+
   const handleClear = () => {
     setSearch('')
+    setCurrentPage(1) // 清除時回到第一頁
     setTimeout(() => {
       inputRef.current?.focus()
-    }, 0) 
+    }, 0)
+  }
+
+  const handlePrev = () => {
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1)
+  }
+
+  const handleNext = () => {
+    if (currentPage < Math.ceil(filteredNotes.length / notesPerPage)) {
+      setCurrentPage((prev) => prev + 1)
+    }
   }
 
   return (
     <section className="max-w-3xl mx-auto px-6 py-12">
       <h1 className="text-3xl font-bold mb-2">📚 筆記總覽</h1>
-      <p className="text-gray-400 text-sm mb-8">{`共有 ${notes.length} 篇筆記`}</p>
+      <p className="text-gray-400 text-sm mb-8">{`共有 ${totalPages} 篇筆記`}</p>
 
       {/* 搜尋框 */}
       <div className="mb-8 relative">
@@ -55,7 +78,10 @@ export default function SearchNotes({ notes }: { notes: Note[] }) {
           ref={inputRef}
           type="text"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value)
+            setCurrentPage(1) // 搜尋時自動跳到第 1 頁
+          }}
           placeholder="搜尋標題、描述、標籤..."
           className="w-full rounded-lg border border-gray-600 bg-gray-800 text-white px-4 py-2 text-sm pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-cyan-400"
         />
@@ -75,40 +101,66 @@ export default function SearchNotes({ notes }: { notes: Note[] }) {
         )}
       </div>
 
+      {/* 筆記列表 */}
       {filteredNotes.length === 0 ? (
         <div className="text-center text-gray-400">
           <p className="mb-2">找不到符合的筆記。</p>
           <p>💡 請換個關鍵字試試看！</p>
         </div>
       ) : (
-        <ul className="space-y-6">
-          {filteredNotes.map((note) => (
-            <li key={note.slug} className="border-b border-gray-700 pb-4">
-              <Link href={`/notes/${note.slug}`}>
-                <h2 className="text-xl font-semibold text-cyan-400 hover:underline">
-                  {highlightText(note.title, search)}
-                </h2>
-              </Link>
-              <p className="text-gray-400 text-sm mt-1">
-                {highlightText(note.description, search)}
-              </p>
+        <>
+          <ul className="space-y-6">
+            {paginatedNotes.map((note) => (
+              <li key={note.slug} className="border-b border-gray-700 pb-4">
+                <Link href={`/notes/${note.slug}`}>
+                  <h2 className="text-xl font-semibold text-cyan-400 hover:underline">
+                    {highlightText(note.title, search)}
+                  </h2>
+                </Link>
+                <p className="text-gray-400 text-sm mt-1">
+                  {highlightText(note.description, search)}
+                </p>
 
-              {Array.isArray(note.tags) && note.tags.length > 0 && (
-                <div className="mt-2 flex gap-2 flex-wrap text-xs text-cyan-300">
-                  {note.tags.map((tag) => (
-                    <Link
-                      key={tag}
-                      href={`/tags/${encodeURIComponent(tag)}`}
-                      className="bg-cyan-900 px-2 py-1 rounded hover:underline"
-                    >
-                      {highlightText('#' + tag, search)}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
+                {Array.isArray(note.tags) && note.tags.length > 0 && (
+                  <div className="mt-2 flex gap-2 flex-wrap text-xs text-cyan-300">
+                    {note.tags.map((tag) => (
+                      <Link
+                        key={tag}
+                        href={`/tags/${encodeURIComponent(tag)}`}
+                        className="bg-cyan-900 px-2 py-1 rounded hover:underline"
+                      >
+                        {highlightText('#' + tag, search)}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+
+          {/* 分頁 */}
+          {filteredNotes.length > notesPerPage && (
+            <div className="flex justify-between items-center mt-8 text-sm text-cyan-400">
+              <button
+                onClick={handlePrev}
+                disabled={currentPage === 1}
+                className={`hover:underline ${currentPage === 1 ? 'text-gray-500 cursor-not-allowed' : ''}`}
+              >
+                ← 上一頁
+              </button>
+              <span>
+                第 {currentPage} 頁 / 共 {totalPages} 頁
+              </span>
+              <button
+                onClick={handleNext}
+                disabled={currentPage === totalPages}
+                className={`hover:underline ${currentPage === totalPages ? 'text-gray-500 cursor-not-allowed' : ''}`}
+              >
+                下一頁 →
+              </button>
+            </div>
+          )}
+        </>
       )}
     </section>
   )
