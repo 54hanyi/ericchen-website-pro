@@ -1,38 +1,8 @@
 import { getAllNotes } from '@/utils/getAllNotes'
-import Link from 'next/link'
+import SearchNotes from '../components/SearchNotes'
 
-export default async function NotesPage() {
+export default async function NotesPageWrapper() {
   const notes = await getAllNotes()
-  const noteCount = notes.length 
-  console.log('🧪 notes:', notes)
 
-  return (
-    <section className="max-w-3xl mx-auto px-6 py-12">
-      <h1 className="text-3xl font-bold mb-2">📚 筆記總覽</h1>
-      <p className="text-gray-400 text-sm mb-8">{`共有 ${noteCount} 篇筆記`}</p>
-
-      <ul className="space-y-6">
-        {notes.map((note) => (
-          <li key={note.slug} className="border-b border-gray-700 pb-4">
-            <Link href={`/notes/${note.slug}`}>
-              <h2 className="text-xl font-semibold text-cyan-400 hover:underline">
-                {note.title}
-              </h2>
-            </Link>
-            <p className="text-gray-400 text-sm mt-1">{note.description}</p>
-
-            {Array.isArray(note.tags) && note.tags.length > 0 && (
-              <div className="mt-2 flex gap-2 flex-wrap text-xs text-cyan-300">
-                {note.tags.map((tag) => (
-                  <span key={tag} className="bg-cyan-900 px-2 py-1 rounded">
-                    {'#' + tag}
-                  </span>
-                ))}
-              </div>
-            )}
-          </li>
-        ))}
-      </ul>
-    </section>
-  )
+  return <SearchNotes notes={notes} />
 }
