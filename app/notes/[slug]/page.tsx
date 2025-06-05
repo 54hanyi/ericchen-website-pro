@@ -1,13 +1,14 @@
-export const dynamic = 'force-dynamic'
-
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { compileMDX } from 'next-mdx-remote/rsc'
 import { getAllNotes } from '@/utils/getAllNotes'
+import { Frontmatter } from '@/utils/types'  // 👈 新增這個
 import path from 'path'
 import fs from 'fs/promises'
 import readingTime from 'reading-time'
 import { format } from 'date-fns'
+
+export const dynamic = 'force-dynamic'
 
 export async function generateStaticParams() {
   const notes = await getAllNotes()
@@ -19,10 +20,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const filePath = path.join(process.cwd(), 'data/notes', slug, 'page.mdx')
   try {
     const source = await fs.readFile(filePath, 'utf8')
-    const { frontmatter } = await compileMDX<{
-      title: string
-      description: string
-    }>({
+    const { frontmatter } = await compileMDX<Frontmatter>({  // 👈 改這裡
       source,
       options: { parseFrontmatter: true },
     })
@@ -42,12 +40,7 @@ export default async function NotePage({ params }: { params: { slug: string } })
     const filePath = path.join(process.cwd(), 'data/notes', slug, 'page.mdx')
     const source = await fs.readFile(filePath, 'utf8')
 
-    const { frontmatter, content } = await compileMDX<{
-      title: string
-      description: string
-      tags?: string[]
-      date?: string
-    }>({
+    const { frontmatter, content } = await compileMDX<Frontmatter>({  // 👈 改這裡
       source,
       options: { parseFrontmatter: true },
     })
