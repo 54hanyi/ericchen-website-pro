@@ -47,7 +47,9 @@ export default function NotePage({ frontmatter, content, prev, next }: NotePageP
       )}
 
       {/* 正文 */}
-      <div>{content}</div>
+      <div className="prose prose-invert prose-lg max-w-none leading-relaxed dark:prose-invert">
+        {content}
+      </div>
 
       {/* 上一篇 / 下一篇 */}
       <div className="mt-12 pt-6 border-t border-gray-700 flex justify-between text-sm text-cyan-400">
