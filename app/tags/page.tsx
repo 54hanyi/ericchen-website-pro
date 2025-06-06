@@ -1,45 +1,58 @@
-import { getAllNotes } from '@/utils/getAllNotes'
+export const dynamic = 'force-dynamic'
+
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { getAllNotes } from '@/utils/getAllNotes'
 
-export const dynamic = 'force-dynamic' // ✅ 不要 cache，確保即時資料
+// 預先生成標籤
+export async function generateStaticParams() {
+  const notes = await getAllNotes()
 
-export default async function TagsPage() {
+  const allTags = notes.flatMap((note) => note.tags ?? [])
+  const uniqueTags = Array.from(new Set(allTags))
+
+  return uniqueTags.map((tag) => ({
+    tag: encodeURIComponent(tag),
+  }))
+}
+
+export async function generateMetadata({ params }: { params: { tag: string } }) {
+  const decodedTag = decodeURIComponent(params.tag)
+  return {
+    title: `#${decodedTag} 筆記標籤分類`,
+    description: `關於 ${decodedTag} 的所有筆記`,
+  }
+}
+
+export default async function TagPage({ params }: { params: { tag: string } }) {
   const allNotes = await getAllNotes()
+  const decodedTag = decodeURIComponent(params.tag)
 
-  // 收集所有 tags
-  const tagCountMap: Record<string, number> = {}
+  const filteredNotes = allNotes.filter((note) =>
+    Array.isArray(note.tags) && note.tags.includes(decodedTag)
+  )
 
-  allNotes.forEach((note) => {
-    if (Array.isArray(note.tags)) {
-      note.tags.forEach((tag) => {
-        tagCountMap[tag] = (tagCountMap[tag] || 0) + 1
-      })
-    }
-  })
-
-  // 轉成陣列並排序（可選：按筆記數量排）
-  const sortedTags = Object.entries(tagCountMap).sort((a, b) => b[1] - a[1])
+  if (filteredNotes.length === 0) {
+    notFound()
+  }
 
   return (
     <section className="max-w-3xl mx-auto px-6 py-12">
-      <h1 className="text-3xl font-bold mb-8">🏷️ 所有標籤</h1>
+      <h1 className="text-3xl font-bold mb-8">#️⃣ 標籤：{decodedTag}</h1>
+      <p className="text-gray-400 mb-8">{filteredNotes.length} 篇筆記</p>
 
-      {sortedTags.length === 0 ? (
-        <p className="text-gray-400">目前沒有標籤。</p>
-      ) : (
-        <ul className="flex flex-wrap gap-4">
-          {sortedTags.map(([tag, count]) => (
-            <li key={tag}>
-              <Link
-                href={`/tags/${tag}`}
-                className="text-cyan-400 hover:underline text-sm"
-              >
-                #{tag} ({count})
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+      <ul className="space-y-6">
+        {filteredNotes.map((note) => (
+          <li key={note.slug} className="border-b border-gray-700 pb-4">
+            <Link href={`/notes/${note.slug}`}>
+              <h2 className="text-xl font-semibold text-cyan-400 hover:underline">
+                {note.title}
+              </h2>
+            </Link>
+            <p className="text-gray-400 text-sm mt-1">{note.description}</p>
+          </li>
+        ))}
+      </ul>
     </section>
   )
 }
