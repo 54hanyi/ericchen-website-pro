@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { compileMDX } from 'next-mdx-remote/rsc'
 import { getAllNotes } from '@/utils/getAllNotes'
-import { Frontmatter } from '@/utils/types'  // 👈 新增這個
+import { Frontmatter } from '@/app/types/rontmatter'
 import path from 'path'
 import fs from 'fs/promises'
 import readingTime from 'reading-time'
@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const filePath = path.join(process.cwd(), 'data/notes', slug, 'page.mdx')
   try {
     const source = await fs.readFile(filePath, 'utf8')
-    const { frontmatter } = await compileMDX<Frontmatter>({  // 👈 改這裡
+    const { frontmatter } = await compileMDX<Frontmatter>({  
       source,
       options: { parseFrontmatter: true },
     })
@@ -40,7 +40,7 @@ export default async function NotePage({ params }: { params: { slug: string } })
     const filePath = path.join(process.cwd(), 'data/notes', slug, 'page.mdx')
     const source = await fs.readFile(filePath, 'utf8')
 
-    const { frontmatter, content } = await compileMDX<Frontmatter>({  // 👈 改這裡
+    const { frontmatter, content } = await compileMDX<Frontmatter>({ 
       source,
       options: { parseFrontmatter: true },
     })
