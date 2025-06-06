@@ -2,6 +2,7 @@ import './globals.css'
 import { ReactNode } from 'react'
 import NavBar from '../components/Navbar'
 import Footer from '../components/Footer'
+import ScrollToTop from '@/components/ScrollToTop'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <NavBar />
         <main className="min-h-screen">{children}</main>
         <Footer />
+        <ScrollToTop />
       </body>
     </html>
   )

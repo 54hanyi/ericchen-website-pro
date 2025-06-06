@@ -1,7 +1,5 @@
-/* ✅ 使用新版 Tailwind v4 的 import 寫法 */
 @import 'tailwindcss';
 
-/* ✅ 自訂 CSS 變數與樣式 */
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -25,7 +23,6 @@ button {
   cursor: pointer;
 }
 
-/* ✅ fade-in 動畫保留 */
 @keyframes fade-in-up {
   0% {
     opacity: 0;
@@ -46,4 +43,20 @@ button {
 }
 .delay-200 {
   animation-delay: 0.2s;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.hover-float:hover {
+  animation: float 1s ease-in-out infinite;
 }
