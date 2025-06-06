@@ -15,7 +15,7 @@ export default function NavBar() {
 
   return (
     <nav className="flex items-center justify-between px-6 py-4 border-b border-gray-800 bg-black/80 sticky top-0 z-50">
-      <div className="text-xl font-bold text-cyan-400">Eric</div>
+      <div className="text-2xl font-bold text-cyan-400">Eric</div>
       <ul className="flex gap-6 text-sm">
         {links.map((link) => (
           <li key={link.href}>
