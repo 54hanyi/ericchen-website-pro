@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { getAllNotes } from '@/utils/getAllNotes'
 import { getNoteBySlug } from '@/utils/getNoteBySlug'
 import NotePage from '@/components/NotePage'
+import { getNoteMetadata } from '@/lib/generateMetadata'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,11 +13,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   try {
-    const { frontmatter } = await getNoteBySlug(params.slug)
-    return {
-      title: frontmatter.title ?? '',
-      description: frontmatter.description ?? '',
-    }
+    return getNoteMetadata(params.slug) 
   } catch (err) {
     console.error(err)
     return {}
