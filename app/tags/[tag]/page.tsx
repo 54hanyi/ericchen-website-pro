@@ -17,7 +17,7 @@ export async function generateStaticParams() {
 
 // 動態 SEO Metadata
 export async function generateMetadata({ params }: { params: { tag: string } }) {
-  const { tag } = await params
+  const { tag } = params
   try {
     return getTagMetadata(tag)
   } catch (err) {
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: { params: { tag: string } }) 
 }
 
 export default async function TagPage({ params }: { params: { tag: string } }) {
-  const { tag } = await params
+  const { tag } = params
   const allNotes = await getAllNotes()
   const decodedTag = decodeURIComponent(tag) 
 
