@@ -1,42 +1,49 @@
-import { notFound } from 'next/navigation'
-import { getAllNotes } from '@/utils/getAllNotes'
-import { getTagMetadata } from '@/lib/getTagMetadata' // 新增 Metadata
-import Link from 'next/link'
+import { Metadata } from 'next'; 
+import { notFound } from 'next/navigation';
+import { getAllNotes } from '@/utils/getAllNotes';
+import { getTagMetadata } from '@/lib/getTagMetadata'; 
+import Link from 'next/link';
 
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic';
+
+type PageProps = {
+  params: {
+    tag: string;
+  };
+};
 
 // 生成靜態路由
 export async function generateStaticParams() {
-  const allNotes = await getAllNotes()
+  const allNotes = await getAllNotes();
   const allTags = Array.from(
     new Set(allNotes.flatMap((note) => note.tags || []))
-  )
+  );
 
-  return allTags.map((tag) => ({ tag: encodeURIComponent(tag) }))
+  return allTags.map((tag) => ({ tag: encodeURIComponent(tag) }));
 }
 
 // 動態 SEO Metadata
-export async function generateMetadata({ params }: { params: { tag: string } }) {
-  const { tag } = params
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { tag } = params;
   try {
-    return getTagMetadata(tag)
+    return await getTagMetadata(tag);
   } catch (err) {
-    console.error(err)
-    return {}
+    console.error(err);
+    return {};
   }
 }
 
-export default async function TagPage({ params }: { params: { tag: string } }) {
-  const { tag } = params
-  const allNotes = await getAllNotes()
-  const decodedTag = decodeURIComponent(tag) 
+export default async function TagPage({ params }: PageProps) {
+  const { tag } = params;
+  const allNotes = await getAllNotes();
+  const decodedTag = decodeURIComponent(tag);
 
   const filteredNotes = allNotes.filter(
     (note) => Array.isArray(note.tags) && note.tags.includes(decodedTag)
-  )
+  );
 
   if (filteredNotes.length === 0) {
-    notFound()
+    notFound();
   }
 
   return (
@@ -57,5 +64,5 @@ export default async function TagPage({ params }: { params: { tag: string } }) {
         ))}
       </ul>
     </section>
-  )
+  );
 }

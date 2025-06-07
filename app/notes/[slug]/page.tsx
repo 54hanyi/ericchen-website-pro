@@ -1,3 +1,4 @@
+import { Metadata } from 'next';
 import { notFound } from 'next/navigation'
 import { getAllNotes } from '@/utils/getAllNotes'
 import { getNoteBySlug } from '@/utils/getNoteBySlug'
@@ -6,15 +7,21 @@ import { getNoteMetadata } from '@/lib/generateMetadata'
 
 export const dynamic = 'force-dynamic'
 
+type PageProps = {
+  params: {
+    slug: string;
+  };
+};
+
 export async function generateStaticParams() {
   const notes = await getAllNotes()
   return notes.map((note) => ({ slug: note.slug }))
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = params
   try {
-    return getNoteMetadata(slug) 
+    return await getNoteMetadata(slug) 
   } catch (err) {
     console.error(err)
     return {}
