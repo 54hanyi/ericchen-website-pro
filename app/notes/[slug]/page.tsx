@@ -12,7 +12,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const { slug } = await params
+  const { slug } = params
   try {
     return getNoteMetadata(slug) 
   } catch (err) {
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function Page({ params }: { params: { slug: string } }) {
-  const { slug } = await params
+  const { slug } = params
   try {
     const notes = await getAllNotes()
     const { frontmatter, content } = await getNoteBySlug(slug)
