@@ -1,0 +1,84 @@
+---
+title: "Next.js 15 Params 應該要 await 的坑"
+description: "記錄遇到 `params.slug` / `params.tag` 要 await 才能用的問題，避免踩坑！"
+tags: ["Next.js", "App Router", "params", "坑"]
+date: "2025-06-06"
+---
+
+# Next.js 15 Params 應該要 `await` 的坑
+
+## 🧐 問題背景
+
+在 **Next.js 13/14** 的 App Router，直接拿 `params.slug`、`params.tag` 是同步的，不需要特別處理。
+
+但是到了 **Next.js 15**，官方做了重大改版：
+
+> `params` 是 async 的，必須 `await` 才能使用裡面的值。
+
+如果你這樣寫：
+
+```tsx
+export default async function Page({ params }: { params: { slug: string } }) {
+  const slug = params.slug; // ❌ 錯誤！Next.js 15 不允許
+}
+```
+
+就會出現這個錯誤訊息：
+
+```
+Error: Route "/notes/[slug]" used `params.slug`. `params` should be awaited before using its properties.
+Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+```
+
+## 🔥 正確解法
+
+要改成這樣，**await** 解構 `params`：
+
+```tsx
+export default async function Page({ params }: { params: { slug: string } }) {
+  const { slug } = await params; // ✅ 正確：await 解構
+}
+```
+
+而 `generateMetadata` 也需要同步調整：
+
+```tsx
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const { slug } = await params; // ✅ 正確：await 解構
+  return {
+    title: `文章：${slug}`,
+  };
+}
+```
+
+## 🧩 為什麼需要這樣？
+
+因為：
+
+- **Server Actions** 推出後，Next.js 15 把所有路由參數 **params** 設計成 async，讓 Server Component 效能更好。
+- **params** 其實是一個 _async resource_，不再是同步物件。
+- 這樣可以配合 Server Actions 更好的延遲載入（lazy fetch），提升性能。
+
+> 小提醒：這個改動只影響 **App Router**，不是舊版 Page Router。
+
+## ✅ 小結
+
+- `params` 要 `await` 之後才能用，包含：
+  - `generateMetadata`
+  - `Page` Component
+- 如果忘記 `await`，**會直接錯誤無法編譯**，不是警告是**編譯錯誤**。
+
+## 📦 建議 Commit 訊息
+
+```bash
+fix: 補上 await 解構 params，修正 Next.js 15 動態路由錯誤
+```
+
+## 💡 延伸閱讀
+
+- [Next.js 15 App Router 改版說明](https://nextjs.org/blog/next-15)
+- [官方錯誤訊息文件](https://nextjs.org/docs/messages/sync-dynamic-apis)
