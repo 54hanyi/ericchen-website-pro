@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import HighlightText from '../HighlightText'
-import { Note } from '@/app/types/note'
+import { Note } from '@/types/note'
 
 export default function NotesList({
   notes,

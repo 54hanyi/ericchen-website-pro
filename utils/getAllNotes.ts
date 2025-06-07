@@ -2,7 +2,7 @@ import path from 'path'
 import fs from 'fs/promises'
 import { compileMDX } from 'next-mdx-remote/rsc'
 import { unstable_cache } from 'next/cache'
-import { Frontmatter } from '@/app/types/rontmatter'  // 👈 新增這個
+import { Frontmatter } from '@/types/rontmatter'  // 👈 新增這個
 
 export type NoteMeta = {
   slug: string

@@ -1,39 +1,45 @@
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic';
 
-import { notFound } from 'next/navigation'
-import Link from 'next/link'
-import { getAllNotes } from '@/utils/getAllNotes'
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import { getAllNotes } from '@/utils/getAllNotes';
+import { DynamicParams } from '@/types/params'; // 👈 用抽出來的型別
 
-// 預先生成標籤
+// 生成靜態路由
 export async function generateStaticParams() {
-  const notes = await getAllNotes()
+  const notes = await getAllNotes();
 
-  const allTags = notes.flatMap((note) => note.tags ?? [])
-  const uniqueTags = Array.from(new Set(allTags))
+  const allTags = notes.flatMap((note) => note.tags ?? []);
+  const uniqueTags = Array.from(new Set(allTags));
 
   return uniqueTags.map((tag) => ({
     tag: encodeURIComponent(tag),
-  }))
+  }));
 }
 
-export async function generateMetadata({ params }: { params: { tag: string } }) {
-  const decodedTag = decodeURIComponent(params.tag)
+// 生成動態 metadata
+export async function generateMetadata({ params }: DynamicParams<'tag'>): Promise<Metadata> {
+  const { tag } = await params;
+  const decodedTag = decodeURIComponent(tag);
   return {
     title: `#${decodedTag} 筆記標籤分類`,
     description: `關於 ${decodedTag} 的所有筆記`,
-  }
+  };
 }
 
-export default async function TagPage({ params }: { params: { tag: string } }) {
-  const allNotes = await getAllNotes()
-  const decodedTag = decodeURIComponent(params.tag)
+// 頁面
+export default async function TagPage({ params }: DynamicParams<'tag'>) {
+  const { tag } = await params;
+  const decodedTag = decodeURIComponent(tag);
 
+  const allNotes = await getAllNotes();
   const filteredNotes = allNotes.filter((note) =>
     Array.isArray(note.tags) && note.tags.includes(decodedTag)
-  )
+  );
 
   if (filteredNotes.length === 0) {
-    notFound()
+    notFound();
   }
 
   return (
@@ -54,5 +60,5 @@ export default async function TagPage({ params }: { params: { tag: string } }) {
         ))}
       </ul>
     </section>
-  )
+  );
 }

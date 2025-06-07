@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Note } from '@/app/types/note'
+import { Note } from '@/types/note'
 import SearchInput from './SearchInput'
 import NotesList from './NotesList'
 import Pagination from './Pagination'

@@ -1,16 +1,10 @@
-import { Metadata } from 'next'; 
 import { notFound } from 'next/navigation';
 import { getAllNotes } from '@/utils/getAllNotes';
 import { getTagMetadata } from '@/lib/getTagMetadata'; 
+import { DynamicParams } from '@/types/params';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
-
-type PageProps = {
-  params: {
-    tag: string;
-  };
-};
 
 // 生成靜態路由
 export async function generateStaticParams() {
@@ -23,8 +17,8 @@ export async function generateStaticParams() {
 }
 
 // 動態 SEO Metadata
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { tag } = params;
+export async function generateMetadata({ params }: DynamicParams<'tag'>) {
+  const { tag } = await params;
   try {
     return await getTagMetadata(tag);
   } catch (err) {
@@ -33,8 +27,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-export default async function TagPage({ params }: PageProps) {
-  const { tag } = params;
+export default async function TagPage({ params }: DynamicParams<'tag'>) {
+  const { tag } = await params;
   const allNotes = await getAllNotes();
   const decodedTag = decodeURIComponent(tag);
 

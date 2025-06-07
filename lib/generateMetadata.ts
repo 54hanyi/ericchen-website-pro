@@ -1,22 +1,25 @@
-import path from 'path'
-import fs from 'fs/promises'
-import { compileMDX } from 'next-mdx-remote/rsc'
+import { Metadata } from 'next';
+import path from 'path';
+import fs from 'fs/promises';
+import { compileMDX } from 'next-mdx-remote/rsc';
 
-export async function getNoteMetadata(slug: string) {
-  const filePath = path.join(process.cwd(), 'data/notes', slug, 'page.mdx')
-  const source = await fs.readFile(filePath, 'utf8')
+export async function getNoteMetadata(slug: string): Promise<Metadata> {
+  const filePath = path.join(process.cwd(), 'data/notes', slug, 'page.mdx');
+  const source = await fs.readFile(filePath, 'utf8');
 
   const { frontmatter } = await compileMDX<{
-    title: string
-    description: string
+    title: string;
+    description: string;
   }>({
     source,
     options: { parseFrontmatter: true },
-  })
+  });
 
-  const title = frontmatter.title ?? '預設標題'
-  const description = frontmatter.description ?? '預設描述'
-  const ogImageUrl = `https://你的網域/api/og?title=${encodeURIComponent(title)}`
+  const title = frontmatter.title ?? '預設標題';
+  const description = frontmatter.description ?? '預設描述';
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'; // 👈 這邊改掉
+  const ogImageUrl = `${siteUrl}/api/og?title=${encodeURIComponent(title)}`;
 
   return {
     title,
@@ -39,5 +42,5 @@ export async function getNoteMetadata(slug: string) {
       description,
       images: [ogImageUrl],
     },
-  }
+  };
 }
