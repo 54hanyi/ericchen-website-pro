@@ -2,15 +2,9 @@ import path from 'path'
 import fs from 'fs/promises'
 import { compileMDX } from 'next-mdx-remote/rsc'
 import { unstable_cache } from 'next/cache'
-import { Frontmatter } from '@/types/rontmatter'  // 👈 新增這個
+import { Frontmatter } from '@/types/frontmatter'
+import { NoteMeta } from '@/types/note'
 
-export type NoteMeta = {
-  slug: string
-  title: string
-  description: string
-  tags?: string[]
-  date?: string
-}
 
 export const getAllNotes = unstable_cache(
   async (): Promise<NoteMeta[]> => {

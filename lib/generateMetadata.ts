@@ -25,7 +25,7 @@ export async function getNoteMetadata(slug: string): Promise<Metadata> {
     title,
     description,
     openGraph: {
-      title,
+      title: `${title} | Eric Chen Notes`,
       description,
       images: [
         {
@@ -42,5 +42,6 @@ export async function getNoteMetadata(slug: string): Promise<Metadata> {
       description,
       images: [ogImageUrl],
     },
+    metadataBase: new URL(siteUrl),
   };
 }

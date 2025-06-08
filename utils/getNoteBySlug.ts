@@ -1,13 +1,8 @@
 import path from 'path'
 import fs from 'fs/promises'
 import { compileMDX } from 'next-mdx-remote/rsc'
+import { Frontmatter } from '@/types/frontmatter'
 
-export type Frontmatter = {
-  title: string
-  description: string
-  tags?: string[]
-  date?: string
-}
 
 export async function getNoteBySlug(slug: string) {
   const filePath = path.join(process.cwd(), 'data/notes', slug, 'page.mdx')

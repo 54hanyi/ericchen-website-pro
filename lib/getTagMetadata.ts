@@ -1,7 +1,7 @@
 export async function getTagMetadata(tag: string) {
   const decodedTag = decodeURIComponent(tag)
-  const siteName = '你的網站名稱' // ← 記得換成你的網站名稱
-  const ogImageUrl = `https://你的網域/api/og?title=${encodeURIComponent(`#${decodedTag}`)}`
+  const siteName = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const ogImageUrl = `https://ericchen-website-pro.vercel.app/api/og?title=${encodeURIComponent(`#${decodedTag}`)}`
 
   return {
     title: `#${decodedTag} - ${siteName}`,
