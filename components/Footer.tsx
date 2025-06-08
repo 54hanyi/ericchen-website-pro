@@ -1,6 +1,7 @@
 'use client';
 
-import { FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
+import { FaGithub, FaEnvelope } from 'react-icons/fa';
+import { SiLine } from 'react-icons/si';
 
 export default function Footer() {
   return (
@@ -8,7 +9,7 @@ export default function Footer() {
       <p className="mb-4 mr-8">© {new Date().getFullYear()} Eric Chen. All rights reserved.</p>
       <div className="flex justify-center gap-6 text-lg">
         <a
-          href="https://github.com/你的GitHub帳號"
+          href="https://github.com/54hanyi"
           target="_blank"
           rel="noopener noreferrer"
           className="hover:text-white"
@@ -16,14 +17,14 @@ export default function Footer() {
           <FaGithub />
         </a>
         <a
-          href="https://linkedin.com/in/你的LinkedIn帳號"
+          href="https://line.me/ti/p/BD3x9tgQjQ"
           target="_blank"
           rel="noopener noreferrer"
           className="hover:text-white"
         >
-          <FaLinkedin />
+          <SiLine />
         </a>
-        <a href="mailto:你的Email地址" className="hover:text-white">
+        <a href="mailto:tp6c04u4456@gmail.com" className="hover:text-white">
           <FaEnvelope />
         </a>
       </div>
