@@ -25,12 +25,12 @@ export default function Home() {
           className="text-xl md:text-2xl text-cyan-300 mb-8"
         >
           <Typewriter
-            words={['A Front-End Developer', 'React Enthusiast', 'Next.js Builder']}
+            words={['A Front-End Developer, React Enthusiast, Next.js Builder']}
             loop={0}
             cursor
             cursorStyle="|"
             typeSpeed={70}
-            deleteSpeed={50}
+            deleteSpeed={40}
             delaySpeed={1500}
           />
         </motion.p>
