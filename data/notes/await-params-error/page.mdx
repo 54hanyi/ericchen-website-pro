@@ -1,8 +1,8 @@
 ---
-title: "Next.js 15 Params 應該要 await 的坑"
-description: "記錄遇到 `params.slug` / `params.tag` 要 await 才能用的問題，避免踩坑！"
-tags: ["Next.js", "App Router", "params", "坑"]
-date: "2025-06-06"
+title: 'Next.js 15 Params 應該要 await 的坑'
+description: '記錄遇到 `params.slug` / `params.tag` 要 await 才能用的問題，避免踩坑！'
+tags: ['Next.js', 'App Router', 'params', '坑']
+date: '2025-06-06'
 ---
 
 # Next.js 15 Params 應該要 `await` 的坑
@@ -43,11 +43,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
 而 `generateMetadata` 也需要同步調整：
 
 ```tsx
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export async function generateMetadata({ params }: { params: { slug: string } }) {
   const { slug } = await params; // ✅ 正確：await 解構
   return {
     title: `文章：${slug}`,

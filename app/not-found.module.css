@@ -38,17 +38,46 @@
 }
 
 /* 流星的隨機性 */
-.meteor:nth-child(1) { left: 20%; animation-duration: 2s; }
-.meteor:nth-child(2) { left: 40%; animation-duration: 3s; }
-.meteor:nth-child(3) { left: 60%; animation-duration: 2.5s; }
-.meteor:nth-child(4) { left: 80%; animation-duration: 3.5s; }
-.meteor:nth-child(5) { left: 25%; animation-duration: 2.2s; }
-.meteor:nth-child(6) { left: 50%; animation-duration: 3.2s; }
-.meteor:nth-child(7) { left: 70%; animation-duration: 2.8s; }
-.meteor:nth-child(8) { left: 85%; animation-duration: 3.1s; }
-.meteor:nth-child(9) { left: 15%; animation-duration: 2.4s; }
-.meteor:nth-child(10) { left: 35%; animation-duration: 3.4s; }
-
+.meteor:nth-child(1) {
+  left: 20%;
+  animation-duration: 2s;
+}
+.meteor:nth-child(2) {
+  left: 40%;
+  animation-duration: 3s;
+}
+.meteor:nth-child(3) {
+  left: 60%;
+  animation-duration: 2.5s;
+}
+.meteor:nth-child(4) {
+  left: 80%;
+  animation-duration: 3.5s;
+}
+.meteor:nth-child(5) {
+  left: 25%;
+  animation-duration: 2.2s;
+}
+.meteor:nth-child(6) {
+  left: 50%;
+  animation-duration: 3.2s;
+}
+.meteor:nth-child(7) {
+  left: 70%;
+  animation-duration: 2.8s;
+}
+.meteor:nth-child(8) {
+  left: 85%;
+  animation-duration: 3.1s;
+}
+.meteor:nth-child(9) {
+  left: 15%;
+  animation-duration: 2.4s;
+}
+.meteor:nth-child(10) {
+  left: 35%;
+  animation-duration: 3.4s;
+}
 
 @keyframes meteor {
   0% {

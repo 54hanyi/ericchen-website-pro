@@ -1,17 +1,17 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 const links = [
   { href: '/', label: '首頁' },
   { href: '/projects', label: '作品集' },
   { href: '/notes', label: '小筆記' },
   { href: '/about', label: '關於我' },
-]
+];
 
 export default function NavBar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <nav className="flex items-center justify-between px-6 py-4 border-b border-gray-800 bg-black/80 sticky top-0 z-50">
@@ -31,5 +31,5 @@ export default function NavBar() {
         ))}
       </ul>
     </nav>
-  )
+  );
 }

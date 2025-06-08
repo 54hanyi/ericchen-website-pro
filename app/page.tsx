@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import { Typewriter } from 'react-simple-typewriter'
+import Link from 'next/link';
+import { Typewriter } from 'react-simple-typewriter';
 
 export default function Home() {
   return (
@@ -42,8 +42,15 @@ export default function Home() {
             <h3 className="text-xl font-semibold mb-2">WhereToPlay 專案</h3>
             <p className="text-gray-400 mb-4">使用 Next.js + TypeScript 開發的場地搜尋平台。</p>
             <div className="flex gap-4">
-              <Link href="https://github.com/54hanyi/next-ts-whereToPlay" className="underline text-cyan-400">GitHub</Link>
-              <Link href="https://whereToPlay-demo.vercel.app" className="underline text-cyan-400">Demo</Link>
+              <Link
+                href="https://github.com/54hanyi/next-ts-whereToPlay"
+                className="underline text-cyan-400"
+              >
+                GitHub
+              </Link>
+              <Link href="https://whereToPlay-demo.vercel.app" className="underline text-cyan-400">
+                Demo
+              </Link>
             </div>
           </div>
           {/* 更多專案卡片可依此格式擴充 */}

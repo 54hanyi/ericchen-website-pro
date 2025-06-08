@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import { Project } from '../data/projects'
+import Link from 'next/link';
+import { Project } from '../data/projects';
 
 interface Props {
-  project: Project
+  project: Project;
 }
 
 export default function ProjectCard({ project }: Props) {
@@ -20,9 +20,13 @@ export default function ProjectCard({ project }: Props) {
         ))}
       </div>
       <div className="flex gap-4">
-        <Link href={project.github} className="underline text-cyan-400">GitHub</Link>
-        <Link href={project.demo} className="underline text-cyan-400">Demo</Link>
+        <Link href={project.github} className="underline text-cyan-400">
+          GitHub
+        </Link>
+        <Link href={project.demo} className="underline text-cyan-400">
+          Demo
+        </Link>
       </div>
     </div>
-  )
+  );
 }

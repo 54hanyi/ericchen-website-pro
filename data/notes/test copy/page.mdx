@@ -1,8 +1,8 @@
 ---
-title: "TEST"
-description: "記錄我如何從傳統 import 模組，轉成用 compileMDX 解析 Frontmatter，解決 Next.js App Router 的坑。"
-tags: ["next.js", "MDX", "compileMDX", "App Router", "血淚史"]
-date: "2025-06-02"
+title: 'TEST'
+description: '記錄我如何從傳統 import 模組，轉成用 compileMDX 解析 Frontmatter，解決 Next.js App Router 的坑。'
+tags: ['next.js', 'MDX', 'compileMDX', 'App Router', '血淚史']
+date: '2025-06-02'
 ---
 
 # MDX 筆記系統開發血淚史：從 `import` 到 `compileMDX`
@@ -24,10 +24,10 @@ date: "2025-06-02"
 
 ```tsx
 export const metadata = {
-  title: "深入理解 useEffect",
-  description: "這篇文章帶你一次釐清 useEffect 的所有依賴陷阱與正確用法。",
-  tags: ["react", "useEffect", "hook"],
-  date: "2024-05-26",
+  title: '深入理解 useEffect',
+  description: '這篇文章帶你一次釐清 useEffect 的所有依賴陷阱與正確用法。',
+  tags: ['react', 'useEffect', 'hook'],
+  date: '2024-05-26',
 };
 ```
 
@@ -56,7 +56,7 @@ const post = await import(`../${params.slug}/page.mdx`);
 官方推薦的新做法：
 
 ```tsx
-import { compileMDX } from "next-mdx-remote/rsc";
+import { compileMDX } from 'next-mdx-remote/rsc';
 ```
 
 搭配選項：
@@ -83,10 +83,10 @@ export const metadata = {...}
 
 ```mdx
 ---
-title: "Next.js 圖片無法顯示的解法"
-description: "部署後圖片不見？你需要加上 image domains！"
-tags: ["next.js", "image", "deploy", "bug"]
-date: "2024-05-25"
+title: 'Next.js 圖片無法顯示的解法'
+description: '部署後圖片不見？你需要加上 image domains！'
+tags: ['next.js', 'image', 'deploy', 'bug']
+date: '2024-05-25'
 ---
 ```
 

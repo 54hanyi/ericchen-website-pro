@@ -1,9 +1,9 @@
-import './globals.css'
-import { ReactNode } from 'react'
-import NavBar from '../components/Navbar'
-import Footer from '../components/Footer'
-import ScrollToTop from '@/components/ScrollToTop'
-import type { Metadata } from 'next'
+import './globals.css';
+import { ReactNode } from 'react';
+import NavBar from '../components/Navbar';
+import Footer from '../components/Footer';
+import ScrollToTop from '@/components/ScrollToTop';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Eric Chen 技術站',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   icons: {
     icon: '/favicon.ico',
   },
-}
+};
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
@@ -38,5 +38,5 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <ScrollToTop />
       </body>
     </html>
-  )
+  );
 }

@@ -34,8 +34,8 @@ export default async function TagPage({ params }: DynamicParams<'tag'>) {
   const decodedTag = decodeURIComponent(tag);
 
   const allNotes = await getAllNotes();
-  const filteredNotes = allNotes.filter((note) =>
-    Array.isArray(note.tags) && note.tags.includes(decodedTag)
+  const filteredNotes = allNotes.filter(
+    (note) => Array.isArray(note.tags) && note.tags.includes(decodedTag)
   );
 
   if (filteredNotes.length === 0) {
@@ -51,9 +51,7 @@ export default async function TagPage({ params }: DynamicParams<'tag'>) {
         {filteredNotes.map((note) => (
           <li key={note.slug} className="border-b border-gray-700 pb-4">
             <Link href={`/notes/${note.slug}`}>
-              <h2 className="text-xl font-semibold text-cyan-400 hover:underline">
-                {note.title}
-              </h2>
+              <h2 className="text-xl font-semibold text-cyan-400 hover:underline">{note.title}</h2>
             </Link>
             <p className="text-gray-400 text-sm mt-1">{note.description}</p>
           </li>

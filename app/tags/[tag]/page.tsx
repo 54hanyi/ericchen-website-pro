@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getAllNotes } from '@/utils/getAllNotes';
-import { getTagMetadata } from '@/lib/getTagMetadata'; 
+import { getTagMetadata } from '@/lib/getTagMetadata';
 import { DynamicParams } from '@/types/params';
 import Link from 'next/link';
 
@@ -9,9 +9,7 @@ export const dynamic = 'force-dynamic';
 // 生成靜態路由
 export async function generateStaticParams() {
   const allNotes = await getAllNotes();
-  const allTags = Array.from(
-    new Set(allNotes.flatMap((note) => note.tags || []))
-  );
+  const allTags = Array.from(new Set(allNotes.flatMap((note) => note.tags || [])));
 
   return allTags.map((tag) => ({ tag: encodeURIComponent(tag) }));
 }
@@ -49,9 +47,7 @@ export default async function TagPage({ params }: DynamicParams<'tag'>) {
         {filteredNotes.map((note) => (
           <li key={note.slug} className="border-b border-gray-700 pb-4">
             <Link href={`/notes/${note.slug}`}>
-              <h2 className="text-xl font-semibold text-cyan-400 hover:underline">
-                {note.title}
-              </h2>
+              <h2 className="text-xl font-semibold text-cyan-400 hover:underline">{note.title}</h2>
             </Link>
             <p className="text-gray-400 text-sm mt-1">{note.description}</p>
           </li>

@@ -1,6 +1,6 @@
-import PageTransition from '../../components/PageTransition'
-import { projects } from '../../data/projects'
-import ProjectCard from '../../components/ProjectCard'
+import PageTransition from '../../components/PageTransition';
+import { projects } from '../../data/projects';
+import ProjectCard from '../../components/ProjectCard';
 
 export default function ProjectsPage() {
   return (
@@ -14,5 +14,5 @@ export default function ProjectsPage() {
         </div>
       </section>
     </PageTransition>
-  )
+  );
 }

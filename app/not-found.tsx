@@ -1,28 +1,28 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import styles from './not-found.module.css'
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import styles from './not-found.module.css';
 
 export default function NotFoundPage() {
-  const [countdown, setCountdown] = useState(5)
+  const [countdown, setCountdown] = useState(5);
 
   const meteors = Array.from({ length: 10 }, (_, i) => (
     <div key={i} className={styles.meteor}></div>
-  ))
+  ));
 
   useEffect(() => {
     if (countdown === 0) {
-      window.location.href = '/'
-      return
+      window.location.href = '/';
+      return;
     }
 
     const timer = setTimeout(() => {
-      setCountdown((prev) => prev - 1)
-    }, 1000)
+      setCountdown((prev) => prev - 1);
+    }, 1000);
 
-    return () => clearTimeout(timer)
-  }, [countdown])
+    return () => clearTimeout(timer);
+  }, [countdown]);
 
   return (
     <div className={styles.container}>
@@ -38,13 +38,9 @@ export default function NotFoundPage() {
           404
         </div>
 
-        <h1 className="text-2xl md:text-3xl font-semibold mt-6">
-          帶你來看流星雨～在這個頁面裡～ 
-        </h1>
+        <h1 className="text-2xl md:text-3xl font-semibold mt-6">帶你來看流星雨～在這個頁面裡～</h1>
 
-        <p className="text-gray-300 mt-4">
-          找不到這個頁面，{countdown} 秒後自動帶你回家
-        </p>
+        <p className="text-gray-300 mt-4">找不到這個頁面，{countdown} 秒後自動帶你回家</p>
 
         <Link
           href="/"
@@ -54,5 +50,5 @@ export default function NotFoundPage() {
         </Link>
       </section>
     </div>
-  )
+  );
 }

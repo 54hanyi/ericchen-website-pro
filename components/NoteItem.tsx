@@ -1,9 +1,9 @@
-'use client'
+'use client';
 
-import { Note } from '../data/notes'
+import { Note } from '../data/notes';
 
 interface Props {
-  note: Note
+  note: Note;
 }
 
 export default function NoteItem({ note }: Props) {
@@ -17,5 +17,5 @@ export default function NoteItem({ note }: Props) {
         </span>
       )}
     </div>
-  )
+  );
 }

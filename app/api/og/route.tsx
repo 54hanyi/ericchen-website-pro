@@ -1,17 +1,17 @@
-import { ImageResponse } from '@vercel/og'
-import { NextRequest } from 'next/server'
+import { ImageResponse } from '@vercel/og';
+import { NextRequest } from 'next/server';
 
-export const runtime = 'edge'
+export const runtime = 'edge';
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = req.nextUrl
-  const title = searchParams.get('title') || '預設標題'
+  const { searchParams } = req.nextUrl;
+  const title = searchParams.get('title') || '預設標題';
 
   return new ImageResponse(
     (
       <div
         style={{
-          backgroundColor: '#0f172a', 
+          backgroundColor: '#0f172a',
           width: '1200px',
           height: '630px',
           display: 'flex',
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
       >
         <div
           style={{
-            fontSize: title.length > 30 ? '64px' : '72px', 
+            fontSize: title.length > 30 ? '64px' : '72px',
             fontWeight: 700,
             color: 'white',
             lineHeight: 1.2,
@@ -50,5 +50,5 @@ export async function GET(req: NextRequest) {
       width: 1200,
       height: 630,
     }
-  )
+  );
 }

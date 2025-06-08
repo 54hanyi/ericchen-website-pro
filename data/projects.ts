@@ -28,4 +28,4 @@ export const projects: Project[] = [
     demo: 'https://next-ts-redux-lottery-delta.vercel.app/',
     techStack: ['Next.js', 'TypeScript', 'Redux Toolkit', 'MUI'],
   },
-]
+];

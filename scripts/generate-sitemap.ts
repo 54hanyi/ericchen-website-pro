@@ -2,7 +2,7 @@ import { readdir, readFile, writeFile } from 'fs/promises';
 import path from 'path';
 import matter from 'gray-matter';
 
-const DOMAIN = 'https://ericchen-website-pro.vercel.app/'; 
+const DOMAIN = 'https://ericchen-website-pro.vercel.app/';
 const NOTES_DIR = path.join(process.cwd(), 'app', 'notes');
 
 async function generateSitemap() {

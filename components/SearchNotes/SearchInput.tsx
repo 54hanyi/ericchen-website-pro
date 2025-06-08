@@ -1,22 +1,22 @@
-'use client'
+'use client';
 
-import { useRef } from 'react'
+import { useRef } from 'react';
 
 export default function SearchInput({
   search,
   setSearch,
 }: {
-  search: string
-  setSearch: (value: string) => void
+  search: string;
+  setSearch: (value: string) => void;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleClear = () => {
-    setSearch('')
+    setSearch('');
     setTimeout(() => {
-      inputRef.current?.focus()
-    }, 0)
-  }
+      inputRef.current?.focus();
+    }, 0);
+  };
 
   return (
     <div className="mb-8 relative">
@@ -41,5 +41,5 @@ export default function SearchInput({
         </button>
       )}
     </div>
-  )
+  );
 }

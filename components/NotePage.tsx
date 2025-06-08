@@ -1,24 +1,24 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import readingTime from 'reading-time'
-import { format } from 'date-fns'
+import Link from 'next/link';
+import readingTime from 'reading-time';
+import { format } from 'date-fns';
 
 type NotePageProps = {
   frontmatter: {
-    title: string
-    description: string
-    tags?: string[]
-    date?: string
-  }
-  content: React.ReactNode
-  prev?: { slug: string; title: string }
-  next?: { slug: string; title: string }
-}
+    title: string;
+    description: string;
+    tags?: string[];
+    date?: string;
+  };
+  content: React.ReactNode;
+  prev?: { slug: string; title: string };
+  next?: { slug: string; title: string };
+};
 
 export default function NotePage({ frontmatter, content, prev, next }: NotePageProps) {
-  const stats = readingTime(frontmatter.title + frontmatter.description) // 粗略計算
-  const chineseReadingTime = `${Math.ceil(stats.minutes)} 分鐘閱讀`
+  const stats = readingTime(frontmatter.title + frontmatter.description); // 粗略計算
+  const chineseReadingTime = `${Math.ceil(stats.minutes)} 分鐘閱讀`;
 
   return (
     <article className="prose prose-invert dark:prose-invert max-w-3xl mx-auto px-6 py-12">
@@ -38,7 +38,11 @@ export default function NotePage({ frontmatter, content, prev, next }: NotePageP
       {Array.isArray(frontmatter.tags) && frontmatter.tags.length > 0 && (
         <div className="mt-2 mb-4 flex gap-2 flex-wrap text-xs text-cyan-300">
           {frontmatter.tags.map((tag) => (
-            <Link key={tag} href={`/tags/${tag}`} className="bg-cyan-900 px-2 py-1 rounded hover:underline">
+            <Link
+              key={tag}
+              href={`/tags/${tag}`}
+              className="bg-cyan-900 px-2 py-1 rounded hover:underline"
+            >
               {'#' + tag}
             </Link>
           ))}
@@ -56,14 +60,18 @@ export default function NotePage({ frontmatter, content, prev, next }: NotePageP
           <Link href={`/notes/${prev.slug}`} className="hover:underline">
             {'← 上一篇：' + String(prev.title ?? '')}
           </Link>
-        ) : <div />}
+        ) : (
+          <div />
+        )}
 
         {next ? (
           <Link href={`/notes/${next.slug}`} className="hover:underline ml-auto">
             {'下一篇：' + String(next.title ?? '') + ' →'}
           </Link>
-        ) : <div />}
+        ) : (
+          <div />
+        )}
       </div>
     </article>
-  )
+  );
 }

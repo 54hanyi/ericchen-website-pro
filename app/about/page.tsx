@@ -1,9 +1,9 @@
 // app/about/page.tsx
-'use client'
+'use client';
 
-import PageTransition from '../../components/PageTransition'
-import Image from 'next/image'
-import { motion } from 'framer-motion'
+import PageTransition from '../../components/PageTransition';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
 
 export default function AboutPage() {
   return (
@@ -49,5 +49,5 @@ export default function AboutPage() {
         </div>
       </section>
     </PageTransition>
-  )
+  );
 }

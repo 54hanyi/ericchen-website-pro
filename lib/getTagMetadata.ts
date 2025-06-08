@@ -1,7 +1,7 @@
 export async function getTagMetadata(tag: string) {
-  const decodedTag = decodeURIComponent(tag)
+  const decodedTag = decodeURIComponent(tag);
   const siteName = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-  const ogImageUrl = `https://ericchen-website-pro.vercel.app/api/og?title=${encodeURIComponent(`#${decodedTag}`)}`
+  const ogImageUrl = `https://ericchen-website-pro.vercel.app/api/og?title=${encodeURIComponent(`#${decodedTag}`)}`;
 
   return {
     title: `#${decodedTag} - ${siteName}`,
@@ -24,5 +24,5 @@ export async function getTagMetadata(tag: string) {
       description: `這是關於「${decodedTag}」的筆記列表。`,
       images: [ogImageUrl],
     },
-  }
+  };
 }

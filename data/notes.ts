@@ -1,8 +1,8 @@
 export interface Note {
-  id: string
-  title: string
-  description: string
-  tag?: string
+  id: string;
+  title: string;
+  description: string;
+  tag?: string;
 }
 
 export const notes: Note[] = [
@@ -24,4 +24,4 @@ export const notes: Note[] = [
     description: '需檢查 hover 類別是否有在 md: 或 lg: 等 breakpoint 中啟用',
     tag: 'Tailwind',
   },
-]
+];

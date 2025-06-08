@@ -1,15 +1,15 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
+import Link from 'next/link';
 
 type TagPageProps = {
-  tag: string
+  tag: string;
   notes: {
-    slug: string
-    title: string
-    description: string
-  }[]
-}
+    slug: string;
+    title: string;
+    description: string;
+  }[];
+};
 
 export default function TagPage({ tag, notes }: TagPageProps) {
   return (
@@ -34,5 +34,5 @@ export default function TagPage({ tag, notes }: TagPageProps) {
         </ul>
       )}
     </section>
-  )
+  );
 }

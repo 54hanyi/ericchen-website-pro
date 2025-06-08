@@ -7,7 +7,6 @@ import { DynamicParams } from '@/types/params';
 
 export const dynamic = 'force-dynamic';
 
-
 export async function generateStaticParams() {
   const notes = await getAllNotes();
   return notes.map((note) => ({ slug: note.slug }));
@@ -23,7 +22,7 @@ export async function generateMetadata({ params }: DynamicParams<'slug'>) {
   }
 }
 
-export default async function Page({ params }: DynamicParams<'slug'>) { 
+export default async function Page({ params }: DynamicParams<'slug'>) {
   const { slug } = await params;
   try {
     const notes = await getAllNotes();
@@ -33,14 +32,7 @@ export default async function Page({ params }: DynamicParams<'slug'>) {
     const prev = notes[currentIndex - 1] ?? null;
     const next = notes[currentIndex + 1] ?? null;
 
-    return (
-      <NotePage
-        frontmatter={frontmatter}
-        content={content}
-        prev={prev}
-        next={next}
-      />
-    );
+    return <NotePage frontmatter={frontmatter} content={content} prev={prev} next={next} />;
   } catch (err) {
     console.error('🧨 讀取文章失敗:', err);
     notFound();

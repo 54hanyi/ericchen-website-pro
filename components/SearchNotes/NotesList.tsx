@@ -1,16 +1,10 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import HighlightText from '../HighlightText'
-import { Note } from '@/types/note'
+import Link from 'next/link';
+import HighlightText from '../HighlightText';
+import { Note } from '@/types/note';
 
-export default function NotesList({
-  notes,
-  keyword,
-}: {
-  notes: Note[]
-  keyword: string
-}) {
+export default function NotesList({ notes, keyword }: { notes: Note[]; keyword: string }) {
   return (
     <ul className="space-y-6">
       {notes.map((note) => (
@@ -40,5 +34,5 @@ export default function NotesList({
         </li>
       ))}
     </ul>
-  )
+  );
 }

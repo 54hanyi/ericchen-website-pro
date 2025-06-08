@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 export default function Pagination({
   currentPage,
@@ -6,10 +6,10 @@ export default function Pagination({
   onPrev,
   onNext,
 }: {
-  currentPage: number
-  totalPages: number
-  onPrev: () => void
-  onNext: () => void
+  currentPage: number;
+  totalPages: number;
+  onPrev: () => void;
+  onNext: () => void;
 }) {
   return (
     <div className="flex justify-between items-center mt-8 text-sm text-cyan-400">
@@ -35,5 +35,5 @@ export default function Pagination({
         下一頁 →
       </button>
     </div>
-  )
+  );
 }
