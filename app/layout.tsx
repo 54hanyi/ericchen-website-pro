@@ -31,9 +31,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="zh-Hant">
-      <body className="bg-black text-white font-sans">
+      <body className="flex flex-col min-h-screen bg-black text-white font-sans">
         <NavBar />
-        <main className="min-h-screen">{children}</main>
+        <main className="flex-1">{children}</main> {/* 重點在 flex-1 */}
         <Footer />
         <ScrollToTop />
       </body>

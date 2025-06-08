@@ -19,7 +19,7 @@
     "@types/mdx": "^2.0.13",
     "@vercel/og": "^0.6.8",
     "date-fns": "^4.1.0",
-    "framer-motion": "^12.12.1",
+    "framer-motion": "^12.16.0",
     "gray-matter": "^4.0.3",
     "next": "15.3.2",
     "next-mdx-remote": "^5.0.0",
