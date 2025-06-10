@@ -9,32 +9,31 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 
 const containerVariants = { hidden: {}, show: { transition: { staggerChildren: 0.2 } } };
-const allTags: string[] = Array.from(new Set(projects.flatMap((p: Project) => p.techStack)));
+const allTags: string[] = Array.from(new Set(projects.flatMap((p) => p.techStack)));
 
 export default function ProjectsPage() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   const toggleTag = (tag: string) => {
-    setSelectedTags((prevTags) =>
-      prevTags.includes(tag) ? prevTags.filter((t) => t !== tag) : [...prevTags, tag]
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
   };
 
   const filteredProjects: Project[] = projects.filter(
-    (p: Project) =>
-      selectedTags.length === 0 || p.techStack.some((t: string) => selectedTags.includes(t))
+    (p) => selectedTags.length === 0 || p.techStack.some((t) => selectedTags.includes(t))
   );
 
   const getNextProject = (): Project | null => {
     if (!selectedProject) return null;
-    const idx = filteredProjects.findIndex((p: Project) => p.title === selectedProject.title);
+    const idx = filteredProjects.findIndex((p) => p.title === selectedProject.title);
     return filteredProjects[(idx + 1) % filteredProjects.length] || null;
   };
 
   const getPrevProject = (): Project | null => {
     if (!selectedProject) return null;
-    const idx = filteredProjects.findIndex((p: Project) => p.title === selectedProject.title);
+    const idx = filteredProjects.findIndex((p) => p.title === selectedProject.title);
     return filteredProjects[(idx - 1 + filteredProjects.length) % filteredProjects.length] || null;
   };
 
@@ -44,7 +43,7 @@ export default function ProjectsPage() {
         <h1 className="text-4xl font-bold text-center mb-12 text-cyan-400">我的作品集</h1>
 
         <div className="flex flex-wrap gap-4 justify-center mb-12">
-          {allTags.map((tag: string) => (
+          {allTags.map((tag) => (
             <TagButton
               key={tag}
               tag={tag}
@@ -63,7 +62,7 @@ export default function ProjectsPage() {
             exit="hidden"
             className="grid gap-16"
           >
-            {filteredProjects.map((project: Project, idx: number) => (
+            {filteredProjects.map((project, idx) => (
               <ProjectCard
                 key={project.title}
                 project={project}

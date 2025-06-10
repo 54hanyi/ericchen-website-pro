@@ -78,6 +78,16 @@ export default function ProjectModal({ project, onClose, onNext, onPrev }: Proje
           <Image src={project.image} alt={project.title} fill className="object-cover rounded-lg" />
         </div>
 
+        {typeof project.detail === 'string' ? (
+          <p className="text-gray-300 mb-6 whitespace-pre-line">{project.detail}</p>
+        ) : (
+          <ul className="list-disc pl-5 text-gray-300 mb-6">
+            {project.detail.map((item, i) => (
+              <li key={i}>{item}</li>
+            ))}
+          </ul>
+        )}
+
         <p className="text-gray-300 mb-4">{project.description}</p>
         <p className="text-gray-400 mb-6 leading-relaxed whitespace-pre-line">{project.detail}</p>
 

@@ -1,19 +1,13 @@
+// components/ProjectCard.tsx
 'use client';
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Project } from '../data/projects';
 
 interface ProjectCardProps {
-  project: {
-    title: string;
-    description: string;
-    detail: string;
-    image: string;
-    techStack: string[];
-    github: string;
-    demo: string;
-  };
+  project: Project;
   index: number;
   onClick: () => void;
 }
