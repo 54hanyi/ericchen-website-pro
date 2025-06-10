@@ -1,4 +1,4 @@
-export type NoteMeta = {
+export type Note = {
   slug: string;
   title: string;
   description: string;

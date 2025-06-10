@@ -1,0 +1,118 @@
+---
+title: 'Next.js 15 generateMetadata 正確使用筆記'
+description: '整理 Next.js App Router generateMetadata 在動態路由中的正確型別與解法，避免 build error，支援 SEO og:image 動態產生。'
+tags: ['next.js', 'generateMetadata', 'App Router', 'TypeScript']
+date: '2025-06-08'
+---
+
+# Next.js 15 `generateMetadata` 正確使用筆記
+
+這篇筆記整理在 Next.js App Router (`app/` 目錄) 使用 `generateMetadata` 時，常見的 TypeScript 型別錯誤與正確解法：
+
+## 🌟 常見錯誤現象
+
+```
+Type '{ params: { slug: string; }; }' is missing the following properties from type 'Promise<any>': then, catch, finally, [Symbol.toStringTag]
+```
+
+- 此錯誤出現在 `generateMetadata` 或 `Page` 函式中，原因是 **Next.js 15 在 App Router 的動態路由 `params` 被設計成 Promise**。
+- 型別不正確，導致 build 失敗。
+
+## 🔧 問題根因
+
+1. 沒有為 `generateMetadata` 指定回傳型別：`Promise<Metadata>`。
+2. `params` 應定義為 `Promise<{ slug: string }>`，且使用時應該 `await params`。
+3. `Page` 函式與 `generateMetadata` 需使用相同型別，避免型別不一致。
+
+## ♻️ 正確做法
+
+### 1. 抽出統一型別 `DynamicParams`
+
+```ts
+// types/params.ts
+export type DynamicParams<K extends string> = {
+  params: Promise<{
+    [key in K]: string;
+  }>;
+};
+```
+
+### 2. 使用 `DynamicParams` 型別
+
+```ts
+import { Metadata } from 'next';
+import { DynamicParams } from '@/types/params';
+
+export async function generateMetadata({ params }: DynamicParams<'slug'>): Promise<Metadata> {
+  const { slug } = await params;
+  return {
+    title: `文章 - ${slug}`,
+    description: `關於 ${slug} 的筆記`,
+  };
+}
+
+export default async function Page({ params }: DynamicParams<'slug'>) {
+  const { slug } = await params;
+  // ...
+}
+```
+
+### 3. 本機與正式環境 URL 管理
+
+在 `.env.local` 設定：
+
+```bash
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+在 Vercel Production 設定 Environment Variable：
+
+```
+NEXT_PUBLIC_SITE_URL=https://你的正式網域
+```
+
+### 4. 生成 og:image 的建議寫法
+
+```ts
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const ogImageUrl = `${siteUrl}/api/og?title=${encodeURIComponent(title)}`;
+```
+
+## ‼️ 額外建議
+
+- `generateMetadata` 建議搭配 Open Graph、Twitter metadata，自動生成社群分享卡片資訊。
+- 型別一定要統一，避免 inline type 與定義 type 不一致導致 build 出錯。
+
+## ✅ 最後總結
+
+| 項目               | 要求                                                   |
+| :----------------- | :----------------------------------------------------- |
+| `params`           | 定義為 `Promise<{ slug: string }>`                     |
+| `generateMetadata` | 定義為 `async function` 並明確回傳 `Promise<Metadata>` |
+| `Page`             | 與 `generateMetadata` 使用相同型別                     |
+| `Metadata`         | 從 `next` 導入正確型別                                 |
+| `og:image` URL     | 由環境變數 `NEXT_PUBLIC_SITE_URL` 動態生成             |
+
+## 🔎 實用範例回顧
+
+```ts
+export type DynamicParams<K extends string> = {
+  params: Promise<{
+    [key in K]: string;
+  }>;
+};
+```
+
+使用：
+
+```ts
+export async function generateMetadata({ params }: DynamicParams<'slug'>): Promise<Metadata> {
+  const { slug } = await params;
+  return { ... };
+}
+
+export default async function Page({ params }: DynamicParams<'slug'>) {
+  const { slug } = await params;
+  // ...
+}
+```
