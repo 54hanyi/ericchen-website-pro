@@ -89,7 +89,6 @@ export default function ProjectModal({ project, onClose, onNext, onPrev }: Proje
         )}
 
         <p className="text-gray-300 mb-4">{project.description}</p>
-        <p className="text-gray-400 mb-6 leading-relaxed whitespace-pre-line">{project.detail}</p>
 
         <div className="flex flex-wrap gap-2 mb-6">
           {project.techStack.map((tech) => (
