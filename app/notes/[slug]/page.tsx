@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: DynamicParams<'slug'>) {
   try {
     return await getNoteMetadata(slug);
   } catch (err) {
-    console.error(err);
+    console.error('generateMetadata 錯誤:', err);
     return {};
   }
 }
@@ -26,15 +26,20 @@ export default async function Page({ params }: DynamicParams<'slug'>) {
   const { slug } = await params;
   try {
     const notes = await getAllNotes();
-    const { frontmatter, content } = await getNoteBySlug(slug);
 
-    const currentIndex = notes.findIndex((n) => n.slug === slug);
-    const prev = notes[currentIndex - 1] ?? null;
-    const next = notes[currentIndex + 1] ?? null;
+    const idx = notes.findIndex((n) => n.slug === slug);
+    if (idx === -1) {
+      return notFound();
+    }
+
+    const prev = idx > 0 ? notes[idx - 1] : null;
+    const next = idx < notes.length - 1 ? notes[idx + 1] : null;
+
+    const { frontmatter, content } = await getNoteBySlug(slug);
 
     return <NotePage frontmatter={frontmatter} content={content} prev={prev} next={next} />;
   } catch (err) {
-    console.error('🧨 讀取文章失敗:', err);
-    notFound();
+    console.error(`讀取筆記失敗，slug=${slug}:`, err);
+    return notFound();
   }
 }
