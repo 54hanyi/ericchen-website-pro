@@ -12,7 +12,7 @@ export default function AboutPage() {
 
   return (
     <PageTransition>
-      <section className="px-6 py-16 max-w-3xl mx-auto text-center">
+      <section className="px-6 py-16 max-w-5xl mx-auto text-center">
         {/* Logo 動態入場 */}
         <motion.div
           initial={{ opacity: 0, y: -50, scale: 0.5 }}
@@ -43,8 +43,8 @@ export default function AboutPage() {
 
         {/* 技能專長 */}
         <InViewMotion direction="right">
-          <h2 className="text-2xl font-semibold mb-6 text-cyan-400">技術專長</h2>
-          <ul className="grid gap-4 grid-cols-2 sm:grid-cols-3 text-base text-gray-200">
+          <h2 className="text-3xl font-semibold mb-6 text-cyan-400">技術專長</h2>
+          <ul className="grid gap-4 grid-cols-2 sm:grid-cols-3 text-2xl text-gray-200">
             {[
               'HTML / CSS',
               'JavaScript / TypeScript',
