@@ -90,7 +90,7 @@ export const projects: Project[] = [
       '個人歷程時間軸：CSS + JS 滾動動畫，動態展示轉職學習歷程',
       '返回頂部按鈕：滾動至底部自動顯示並可快速回頂',
     ],
-    image: '/images/ericchen-website.png',
+    image: '/images/ericchen-website.jpg',
     github: 'https://github.com/54hanyi/ericchen-website',
     demo: 'https://54hanyi.github.io/ericchen-website/',
 
