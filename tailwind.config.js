@@ -1,7 +1,6 @@
-import type { Config } from 'tailwindcss';
-import typography from '@tailwindcss/typography';
+/** @type {import('tailwindcss').Config} */
 
-const config: Config = {
+module.exports = {
   theme: {
     extend: {
       typography: {
