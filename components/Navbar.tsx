@@ -22,7 +22,9 @@ export default function NavBar() {
   return (
     <nav className="flex items-center justify-between px-6 py-4 border-b border-gray-800 bg-black/80 sticky top-0 z-50">
       {/* Logo / 標題 */}
-      <div className="text-2xl font-bold text-cyan-400">EricChen</div>
+      <Link href="./" className="text-2xl font-bold text-cyan-400">
+        EricChen
+      </Link>
 
       {/* 漢堡按鈕：小螢幕顯示，大螢幕隱藏 */}
       <button
