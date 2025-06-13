@@ -1,0 +1,12 @@
+---
+title: 'Frontmatter 語法錯誤'
+description: '確保 YAML frontmatter 格式正確'
+date: '2025-06-13'
+tags: ['MDX', 'YAML']
+---
+
+### MDX 文件需以 `---` 包圍 frontmatter；fields: title, description, date (ISO 格式)、tags (陣列)。
+
+### 使用 markdown/YAML lint 工具檢查語法；注意特殊字元需引號或轉義。
+
+### compileMDX catch 中 log 詳細錯誤位置，方便快速修正 frontmatter 錯誤。

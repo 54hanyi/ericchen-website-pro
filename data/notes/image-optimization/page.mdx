@@ -1,0 +1,10 @@
+---
+title: '圖片優化與 Next.js Image'
+description: 'Next.js Image 需 StaticImport 或 width/height'
+date: '2025-06-13'
+tags: ['Next.js', 'MDX']
+---
+
+- 通用 fallback 使用 `<img loading="lazy" alt="">`，避免 Next.js `<Image>` 必須指定寬高的限制。
+- 若要使用 Next.js `<Image>`，MDX 使用者需靜態匯入或在 props 明確提供 width/height；不符時映射回傳 null 並 console.warn。
+- 可在 build 階段讀取本地圖片 metadata，自動注入 width/height 到 MDX props，提高自動化。

@@ -1,0 +1,26 @@
+---
+title: 'compileMDX Options 設定'
+description: 'remarkPlugins/rehypePlugins 必須放在 mdxOptions 中'
+date: '2025-06-13'
+tags: ['MDX', 'TypeScript']
+---
+
+- 使用 next-mdx-remote/rsc compileMDX 時：
+
+  ```ts
+  const { frontmatter, content } = await compileMDX<Frontmatter>({
+    source,
+    options: {
+      parseFrontmatter: true,
+      mdxOptions: {
+        remarkPlugins: [...],
+        rehypePlugins: [...],
+      },
+    },
+    components: MDXComponents,
+  });
+  ```
+
+- 可避免 TypeScript 報錯「SerializeOptions 中沒有 remarkPlugins」。
+
+- compileMDX 拋錯時，在 catch 中詳盡 console.error，快速排查 frontmatter 或 MDX 語法問題。

@@ -1,0 +1,12 @@
+---
+title: '部署注意事項'
+description: 'Vercel build 與路徑'
+date: '2025-06-13'
+tags: ['Next.js', 'Deployment']
+---
+
+### 確保 data/notes 資料夾在 build 階段正確包含 MDX 檔案。
+
+### 若 SSG，generateStaticParams 回傳完整 slug；若 SSR，`export const dynamic = 'force-dynamic'`。
+
+### 注意 Windows 路徑與檔名限制，檔名僅用英數、連字號、底線、句點；避免無法開啟問題。

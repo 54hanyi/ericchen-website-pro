@@ -1,0 +1,35 @@
+---
+title: 'CSS Flexbox 與 Grid 應用'
+description: '比較 Flexbox 和 Grid，並記錄實務選擇情境'
+date: '2025-06-14'
+tags: ['CSS', 'Layout']
+---
+
+## Flexbox
+
+- 適合一維排列（row 或 column）。用在水平或垂直排列、置中、按鈕列、navbar、列表項排列等場景。
+- 常用屬性：`display: flex; justify-content; align-items; flex-wrap; flex-grow/shrink/basis; gap`。
+- 優點：語法直觀，適合動態新增或刪除項目。
+
+## Grid
+
+- 適合二維佈局，可同時管理行與列。用在複雜排版，如 Dashboard、Gallery、多欄式排版等。
+- 屬性：`display: grid; grid-template-columns/rows; grid-template-areas; gap; justify-items; align-items; auto-flow`。
+- 優點：可精確定義區域和尺寸，對大型佈局較靈活。
+
+## 選擇指引
+
+- 換頁面或小元件內單維度排列，用 Flexbox 最直接；跨區域整體網格或複雜版面，用 Grid。
+- 有時結合：用 Grid 定整體區塊，區塊內再用 Flexbox 排列內容。
+- 針對響應式：Grid 可搭配媒體查詢變更模板列數；Flexbox 可自動換行。
+
+## 實作心得
+
+- 在 Tailwind 中，Flex 和 Grid class 很容易上手，可快速試排；但仍需了解底層行為，避免意外重排或伸縮。
+- debugging 時可在 DevTools 中暫時加背景色、邊框檢查佈局區域。
+- 避免在 Flex container 子項加過多 margin 影響父容器大小，或 Grid 中過度使用 auto-fit/auto-fill 造成不易控制的行為。
+
+## 延伸思考
+
+- 想做 masonry 佈局時，可用 CSS Grid + `grid-auto-flow: dense` 或 JS 計算，或考慮 Masonry library。
+- Flexbox 換行後對齊：`align-content`、`align-items` 的行為常造成誤會，可多測試不同屬性組合。

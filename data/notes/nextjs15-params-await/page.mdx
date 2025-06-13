@@ -1,0 +1,12 @@
+---
+title: 'Next.js 15 Params Await'
+description: '動態路由 params 必須 await'
+date: '2025-06-13'
+tags: ['Next.js', 'TypeScript']
+---
+
+### 在 Page 與 generateMetadata 中使用 `const { slug } = await params;`。
+
+### 忘記 await 會導致編譯錯誤，注意型別一致。
+
+### 可抽 DynamicParams type 重用，避免重複定義。

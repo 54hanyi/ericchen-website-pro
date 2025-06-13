@@ -1,0 +1,125 @@
+---
+title: 'JavaScript 閉包 (Closure) '
+description: '記錄 JS 閉包概念、機制與常見使用方法'
+date: '2025-06-14'
+tags: ['JavaScript', 'Closure']
+---
+
+## 概念回顧
+
+- 「閉包」是當內部函式能持續訪問其外部作用域的變量，即使外部函式已經執行完畢，該作用域依然被保留。
+- 這源於 JavaScript 的詞法作用域：函式在定義階段就「綁定」了當時的環境。
+
+## 機制重點
+
+- 當呼叫外部函式並返回內部函式時，JavaScript 會保留那份執行上下文，使內部函式的 scope chain 中保有外部變量。
+- 注意：若閉包中保留的變量包含大量資料或 DOM 參照，需留意記憶體釋放；否則可能造成記憶體洩漏。
+
+## 常見應用
+
+以下幾種場景與示例程式碼：
+
+### 私有狀態封裝
+
+```js
+function createCounter() {
+  let count = 0;
+  return {
+    increment() {
+      count++;
+      return count;
+    },
+    decrement() {
+      count--;
+      return count;
+    },
+  };
+}
+const c = createCounter();
+console.log(c.increment()); // 1
+```
+
+這種模式透過閉包將 `count` 隱藏在內部，外部只能透過 `increment` / `decrement` 方法操作，不直接暴露內部 state。
+
+### 防抖 (Debounce) / 節流 (Throttle)
+
+```js
+function debounce(fn, delay) {
+  let timer = null;
+  return function (...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+```
+
+- `timer` 由閉包持有，每次呼叫共用同一個變量。
+- 常見於輸入框防抖、滾動事件防抖等場景。
+- 若要做節流 (throttle)，概念相似，可在閉包內保存上次執行時間等。
+
+### 部分應用 (Partial Application)
+
+```js
+function multiply(a) {
+  return function (b) {
+    return a * b;
+  };
+}
+const double = multiply(2);
+console.log(double(5)); // 10
+```
+
+閉包保留最外層 `a`，讓返回函式能使用該值；常見於函式式編程、參數預設等。
+
+### 事件或回呼保留上下文
+
+```js
+function setupClickLogger(element) {
+  let count = 0;
+  element.addEventListener('click', () => {
+    count++;
+    console.log(`已點擊 ${count} 次`);
+  });
+}
+```
+
+- `count` 在閉包中被保留，每次點擊皆能讀寫；在解除事件監聽時，記得釋放對 DOM 的引用以避免記憶體洩漏。
+
+### 模組化封裝 (IIFE / 模組模式)
+
+```js
+const MyModule = (function () {
+  let privateVar = 42;
+  function privateFn() {
+    /* ... */
+  }
+  return {
+    publicMethod() {
+      console.log(privateVar);
+    },
+  };
+})();
+```
+
+- IIFE 立即執行，創造私有作用域，回傳公開 API，避免全域污染。
+
+## 常見注意事項
+
+- **記憶體洩漏**：若閉包變量持有大型資料或 DOM 節點，須在不再使用時解除引用，例如在解除事件監聽時移除閉包中對 DOM 的引用；可用 DevTools 的 memory snapshot 檢查。
+- **過度複雜**：多層嵌套閉包可能降低可讀性與維護性；遇到複雜邏輯，可考慮拆模組、使用 class 私有屬性或其他設計模式替代。
+- **this 與閉包**：箭頭函式與普通函式的 `this` 綁定規則不同，若在閉包中使用 `this`，需留意呼叫上下文；如無需動態 this，可採箭頭函式避免誤用。
+- **效能與 GC**：注意閉包持有的不必要變量，確保垃圾回收時能回收；如需弱引用，可考慮 `WeakMap` / `WeakRef`（注意瀏覽器支援）。
+
+## 實務小技巧
+
+- 若閉包中保留資料量大或易形成循環引用，可考慮使用 WeakMap/WeakRef，或在適當時機手動清除引用。
+- 在開發者工具中觀察 memory snapshot，確認閉包不留不必要引用。
+- 根據需求選擇其他封裝方式（如 class 私有屬性、模組化封裝），避免過度使用深層閉包。
+- 可在 ESLint 規則中針對閉包內 this、變量命名等做檢查，減少潛在錯誤。
+
+## 延伸閱讀（可選）
+
+- 辨識與避免常見閉包陷阱，例如迴圈中綁定閉包等。
+- 與 JavaScript 引擎垃圾回收機制配合，深入瞭解閉包保留上下文對記憶體的影響。
+- 在 React Hook (如 useEffect 內部) 使用閉包時，注意依賴列表管理與 stale closure 問題。
+- 使用 TypeScript 時，閉包與型別推斷的注意事項。

@@ -1,0 +1,32 @@
+---
+title: 'React Virtual DOM'
+description: '理解 Virtual DOM、Diff 機制與 Fiber 架構'
+date: '2025-06-14'
+tags: ['React', 'Virtual DOM']
+---
+
+## Virtual DOM 角色
+
+- React 保持一份虛擬 DOM 樹表示 UI 狀態。每次 state/props 更新時，產生新的虛擬樹，與先前樹 diff，計算最小更新後再操作真實 DOM。
+- 減少直接 DOM 操作成本，提升效能。
+
+## Diff 演算法
+
+- React 使用 heuristics：比較同層元素，key 幫助比對順序；若 type 不同則整棵子樹重建；同 type 則遞迴比較 props 及 children。
+- Key 在列表重排時很重要，避免不必要重繪或狀態錯亂。
+
+## React Fiber
+
+- React 16+ 重寫為 Fiber 架構，允許中斷、恢復更新。將更新拆成小工作單元 (work unit)，並根據優先級 (priority) 調度。
+- 減少長任務阻塞 UI，提升回應性；如 Concurrent Mode 下可更靈活處理高優先互動。
+
+## 實務觀察
+
+- 避免列表缺少 key 或使用 index 作 key 導致重排問題。
+- 理解 diff 機制，有助優化複雜列表或避免不必要重新渲染。
+- Fiber 調度機制雖在內部，但在大量狀態更新或動畫場景下，理解優先級對 UX 有幫助。
+
+## 延伸思考
+
+- React 18 的 Concurrent Features：startTransition、useTransition 等背後原理。
+- 如何手動分段更新以避免長任務？（如使用 setTimeout 或 useDeferredValue）。

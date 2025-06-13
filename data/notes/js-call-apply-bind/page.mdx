@@ -1,0 +1,106 @@
+---
+title: 'JavaScript call/apply/bind'
+description: '整理 Function.prototype.call/apply/bind 用法與注意'
+date: '2025-06-14'
+tags: ['JavaScript', 'Function']
+---
+
+## call(thisArg, arg1, arg2, ...)
+
+- **立即呼叫函式**：使用指定的 `thisArg` 作為 `this`，後續參數依序傳入函式。
+- **範例**：
+  ```js
+  function greet(greeting, punctuation) {
+    console.log(greeting + ', ' + this.name + punctuation);
+  }
+  const obj = { name: 'Alice' };
+  greet.call(obj, 'Hello', '!'); // Hello, Alice!
+  ```
+- **適合場合**：當需要單次動態指定 `this`，或借用其他物件的方法時。
+
+## apply(thisArg, argsArray)
+
+- **與 call 類似**，但參數以陣列或類陣列傳入：`fn.apply(thisArg, [arg1, arg2, ...])`。
+- **範例**：
+  ```js
+  function sum(a, b, c) {
+    return a + b + c;
+  }
+  const arr = [1, 2, 3];
+  console.log(sum.apply(null, arr)); // 6
+  ```
+- **適合場合**：當參數已存在陣列或類陣列時快捷傳入。
+- **ES6 之後**：多使用展開語法 `fn(...arr)`，但在某些動態或舊環境中，`apply` 仍有用武之地。
+
+## bind(thisArg, ...args)
+
+- **返回綁定函式**：不會立即執行，回傳一個新函式，執行時 `this` 固定為 `thisArg`，並可預先綁定部分參數。
+- **範例**：
+
+  ```js
+  const module = {
+    x: 42,
+    getX() {
+      return this.x;
+    },
+  };
+  const unbound = module.getX;
+  console.log(unbound()); // undefined 或全域 this.x
+  const bound = unbound.bind(module);
+  console.log(bound()); // 42
+
+  function multiply(a, b) {
+    return a * b;
+  }
+  const double = multiply.bind(null, 2);
+  console.log(double(5)); // 10
+  ```
+
+- **適合場合**：事件處理或回呼中綁定上下文、偏函式(partial application)、在需要延遲呼叫時預先綁定 `this` 和初始參數。
+- **注意**：
+  - 每次調用 `bind` 都會創建新的函式，影響記憶體使用與函式身份 (`===`) 比較。
+  - 箭頭函式無自己的 `this`，`call`/`apply`/`bind` 無法改變其內部 `this`。
+  - 在現代框架（如 React Hooks）中，通常使用箭頭函式或其他方式，較少直接 `bind`，但理解機制有助閱讀和維護舊程式碼。
+
+## 注意事項
+
+- **this 混亂排查**：遇到 `this` 不如預期，先檢查呼叫方式，思考是否需要 `call`/`apply`/`bind`。
+- **參數處理**：若參數來源為陣列或動態組合時，可考慮 `apply` 或展開語法。
+- **效能考量**：避免在頻繁調用場景中頻繁 `bind`，可考慮其它模式或將綁定函式儲存起來重複使用。
+- **與函式式編程結合**：使用 `bind` 進行偏函式，或與柯里化 (currying) 模式結合，可提升程式靈活度，但需留意可讀性。
+
+## 範例思考
+
+```js
+// 借用 Array.prototype 方法
+const obj = { length: 0 };
+Array.prototype.push.call(obj, 1);
+Array.prototype.push.call(obj, 2);
+console.log(obj); // { '0': 1, '1': 2, length: 2 }
+
+// 綁定事件處理 (傳統寫法)
+// class MyComponent {
+//   constructor(name) {
+//     this.name = name;
+//     this.handleClick = this.handleClick.bind(this);
+//   }
+//   handleClick() {
+//     console.log(this.name);
+//   }
+// }
+// // React Hooks 中常用箭頭函式或 useCallback，較少 bind
+
+// 偏函式示例
+function greet(greeting, name) {
+  console.log(greeting + ', ' + name);
+}
+const sayHelloTo = greet.bind(null, 'Hello');
+sayHelloTo('Bob'); // Hello, Bob
+```
+
+## 個人心得
+
+- 遇到 `this` 混亂時，檢查呼叫上下文及繫結方式，決定是否需要使用 `call`/`apply`/`bind`。
+- 大多數情境下，ES6 展開語法和箭頭函式足以處理參數和上下文，直接使用 `apply`/`bind` 的頻率下降，但理解細節仍有助閱讀和維護舊有程式碼。
+- 留意 `bind` 創建新函式的成本，若需重複綁定，考慮將綁定後的函式儲存起來。
+- 在多人協作或大型程式中，明確規範 `this` 使用方式，避免混亂，提高可讀性和可維護性。

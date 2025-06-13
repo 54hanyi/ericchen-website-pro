@@ -1,0 +1,21 @@
+---
+title: 'remark Plugin 自動轉換'
+description: '自動將 mdx code fence 轉為 jsx'
+date: '2025-06-13'
+tags: ['MDX', 'Remark']
+---
+
+### 撰寫 remark plugin，例如：
+
+```ts
+import { visit } from 'unist-util-visit';
+export default function remarkMdxToJsx() {
+  return (tree: any) => {
+    visit(tree, 'code', (node) => {
+      if (node.lang === 'mdx') node.lang = 'jsx';
+    });
+  };
+}
+```
+
+### 在 compileMDX mdxOptions.remarkPlugins 中注入該 plugin，自動轉換，避免 Prism Unknown language 錯誤。

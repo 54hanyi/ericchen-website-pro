@@ -1,0 +1,12 @@
+---
+title: 'NotePage Content 型別'
+description: 'content 定義為 React.ReactNode'
+date: '2025-06-13'
+tags: ['TypeScript', 'React']
+---
+
+### compileMDX 返回 content 可能為 ReactElement，NotePage props 定義 `content: React.ReactNode` 即可直接渲染 `{content}`。
+
+### 避免預期 MDXContentType，若返回 component function，可在頁面使用 `<MDXContent components={MDXComponents} />`。
+
+### 確認 next-mdx-remote 版本行為後，再調整 props 型別。

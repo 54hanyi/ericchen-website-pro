@@ -13,7 +13,7 @@ export const MDXComponents = {
     <h1 className="mt-8 text-3xl font-bold" {...props} />
   ),
   h2: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h2 className="mt-6 text-2xl font-semibold" {...props} />
+    <h2 className="mt-6 text-2xl font-semibold" style={{ color: '#22d3ee' }} {...props} />
   ),
   h3: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h3 className="mt-4 text-xl font-medium" {...props} />

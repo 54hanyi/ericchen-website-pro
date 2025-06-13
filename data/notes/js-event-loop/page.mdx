@@ -1,0 +1,70 @@
+---
+title: 'JavaScript 事件循環 (Event Loop)'
+description: '釐清 Call Stack、MacroTask 與 MicroTask 執行順序'
+date: '2025-06-14'
+tags: ['JavaScript', 'Event Loop']
+---
+
+## Call Stack & Task Queue
+
+- **主執行緒只有一個 Call Stack**：同步程式碼依序推入並執行，執行完畢才 pop。
+- **異步操作完成後**，其回呼放入對應的任務佇列 (task queue)，等待 Call Stack 空時再取出執行。
+
+> **重點**：Call Stack 空閒之後，才會從 Task Queue 取出下一個 MacroTask 執行。
+
+## MacroTask vs MicroTask
+
+- **MacroTask**：
+  - 例如 `setTimeout`、`setInterval`、DOM 事件回呼、I/O callback、setImmediate（Node.js）、MessageChannel 等。
+- **MicroTask**：
+  - 例如 `Promise.then`、`Promise.catch`、`Promise.finally`、`queueMicrotask`、`MutationObserver`。
+- **執行順序機制**：
+  1. 每當 Call Stack 處理完一個 MacroTask，會觸發檢查並執行所有當前排隊的 MicroTasks，直到清空。
+  2. MicroTasks 清空後，才會從下一個 MacroTask 佇列中取任務執行。
+- **為何重要**：
+  - MicroTask 被視為更高優先級，常用於在同一輪事件循環中立刻執行緊急異步後續，例如在 promise 解決後立即處理結果、或在 DOM 變更後用 MutationObserver 做補充處理。
+
+## 範例驗證
+
+下面程式碼驗證 Call Stack、MacroTask、MicroTask 的執行順序：
+
+```js
+console.log('開始');
+
+setTimeout(() => console.log('timeout'), 0);
+
+Promise.resolve()
+  .then(() => console.log('promise1'))
+  .then(() => console.log('promise2'));
+
+console.log('結束');
+// 預期輸出順序：
+// 開始
+// 結束
+// promise1
+// promise2
+// timeout
+## 同步與異步流程總結
+
+同步程式先執行，`setTimeout` callback 放入 MacroTask，Promise 回呼放入 MicroTask。當 Call Stack 清空後，先執行所有 MicroTask，再執行下一個 MacroTask。
+
+## 實務注意
+
+- **防止 UI 阻塞**：若同步程式過長，容易導致 UI 卡頓，可考慮將重計算拆分為多個宏任務（例如多次 `setTimeout(fn, 0)` 或 `requestIdleCallback`）或使用 Web Worker，將計算搬到背景執行，保持主執行緒流暢。
+- **Promise 連鎖**：理解 MicroTask 的優先執行順序，可避免 race condition。例如在多個 `.then` 或 `async/await` 組合中，要注意何時執行下一步，以及可能對先前狀態的影響。
+- **Node.js Event Loop 階段**：深入了解 Node.js 的各階段（timers、pending callbacks、idle、poll、check、close callbacks 等）有助於優化高併發伺服器邏輯。例如避免在不當階段做大量同步 I/O，或合理安排 `setImmediate`、`process.nextTick` 與 `Promise` 微任務，使事件循環更高效。
+- **React 更新行為**：在 React 中，`setState` 的批次更新、`useEffect` 排程等都受到 event loop 機制影響。理解哪些回呼是在微任務階段、哪些在宏任務階段，有助於排查異步行為、避免狀態過早或過晚更新，並增進效能調整。
+- **避免 MicroTask 飢餓**：如果在一個微任務中不斷註冊新的 Promise 回呼，可能導致微任務隊列永遠不清空，宏任務無機會執行，造成宏任務「飢餓」（starvation）。在設計時要留意不要在 `.then` 中無限循環地產生微任務。
+- **觀察重繪節奏**（瀏覽器端）：每輪 MacroTask + MicroTask 結束後，瀏覽器會進行一次重繪。若需要多次更新 DOM，可分散到多輪事件循環，以減少一次性大量重排/重繪對效能的影響。
+- **錯誤處理與偵錯**：MicroTask 內若拋出錯誤（未捕獲的 promise rejection），可能影響後續任務執行。應善用 `.catch`、全域 `unhandledrejection` 或 `try/catch` 結構，避免意外中斷任務隊列。
+
+## 個人實踐心得
+
+- **Debug 時機觀察**：在不同階段的回呼中加入 `console.log(Date.now(), '標籤或說明')`，能清楚看到各回呼執行的時機差異，幫助理解實際流程。
+- **分段非同步處理**：對大量同步 heavy computation，可拆成小塊並分派到多個宏任務或使用 Web Worker，避免主執行緒長時間被佔用。
+- **避免無限微任務循環**：在設計 Promise 連鎖時，留意不要在 `.then` 或 `async` 中無限迴圈註冊新的微任務，防止阻塞宏任務。可用條件或計數器限制註冊次數。
+- **合理安排異步優先級**：對於需要盡快執行的後續邏輯（例如更新 UI 狀態），可放在微任務；對於不急執行的工作（如日誌上傳、背景清理），可放在宏任務，以免影響主要流程。
+- **觀察瀏覽器與 Node 行為差異**：在瀏覽器和 Node.js 平台測試事件循環範例，理解兩者在 timers 與微任務階段的細微差異，能在跨平台程式時避免誤解。
+- **結合工具輔助**：使用瀏覽器 DevTools 的 Performance 面板，監控長任務（Long Task）；使用 Node.js 性能分析工具（如 `clinic.js`、`node --trace-events`）了解事件循環瓶頸。
+- **持續學習**：事件循環機制是底層核心概念，隨著 ECMAScript 新特性（如 `scheduler` API）、瀏覽器與 Node.js 優化更新，持續關注最新演進，並在專案中適時調整異步策略。
+```

@@ -1,6 +1,11 @@
 /** @type {import('tailwindcss').Config} */
 
 module.exports = {
+  content: [
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx}',
+  ],
   theme: {
     extend: {
       typography: {
@@ -10,7 +15,7 @@ module.exports = {
             a: { color: '#22d3ee', textDecoration: 'none' }, // cyan-400
             strong: { color: '#f3f4f6' }, // gray-100
             h1: { color: '#f3f4f6' },
-            h2: { color: '#f3f4f6' },
+            h2: { color: '#22d3ee' },
             h3: { color: '#f3f4f6' },
             code: {
               backgroundColor: '#1f2937', // gray-800

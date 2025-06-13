@@ -1,0 +1,48 @@
+---
+title: 'HTTP 與 CORS 安全'
+description: '同源政策、CORS 配置與 HTTPS 要點'
+date: '2025-06-14'
+tags: ['Security', 'HTTP']
+---
+
+## Same-Origin Policy
+
+- **定義**：限制 JavaScript 只能存取相同協議、域、埠 (scheme, host, port) 的資源，防止惡意網站竊取或操控敏感資料。
+- **影響**：跨域請求受到限制，包括 AJAX、DOM 存取等。開發時需理解何時會觸發同源政策限制。
+
+## CORS (Cross-Origin Resource Sharing)
+
+- **基本概念**：後端在 HTTP 回應 header 加上 `Access-Control-Allow-Origin`、`Access-Control-Allow-Methods`、`Access-Control-Allow-Headers` 等，允許特定來源或所有來源訪問資源。
+- **簡單請求 vs Preflight 請求**：
+  - **簡單請求**：使用 GET/POST (Content-Type 為 application/x-www-form-urlencoded, multipart/form-data, text/plain) 等情況，直接發送，瀏覽器自動附帶 Origin header，後端檢查即可。
+  - **Preflight (OPTIONS) 請求**：當請求使用非簡單方法 (如 PUT、DELETE) 或帶自訂 header 時，瀏覽器先發 OPTIONS 預檢請求，後端需在回應中允許該方法與 header，才會發送實際請求。
+- **回應 Header 範例**：
+  ```http
+  Access-Control-Allow-Origin: https://example.com
+  Access-Control-Allow-Methods: GET, POST, PUT
+  Access-Control-Allow-Headers: Content-Type, Authorization
+  Access-Control-Allow-Credentials: true
+  Access-Control-Max-Age: 600
+  ```
+- **注意**：前端無法忽略 CORS，需後端正確配置；開發環境可透過 proxy 或本地開發 server 設定解決跨域問題。
+
+## Credentials 與 Cookie
+
+- **帶 Cookie 請求**：若要跨域攜帶 Cookie 或 HTTP 認證資訊，前端 fetch/axios 需設定 `credentials: 'include'`，或 `xhr.withCredentials = true`；後端須在回應中設置 `Access-Control-Allow-Credentials: true`，並明確指定 `Access-Control-Allow-Origin` 為具體域，不可使用 `*`。
+- **安全考量**：Cookie 需設定 `Secure`、`HttpOnly`、`SameSite` 屬性，減少 CSRF、XSS 風險；`SameSite` 可採用 `Lax` 或 `Strict` 視情境。
+- **Token 認證**：使用 JWT 或其他 token 時，若存放於 localStorage/sessionStorage，需注意 XSS 風險；可考慮同源 cookie + CSRF token 結合方案。
+
+## HTTPS 與安全傳輸
+
+- **必用 HTTPS**：生產環境務必使用 HTTPS，確保資料加密傳輸，防止中間人 (MITM) 攻擊。
+- **HSTS (HTTP Strict Transport Security)**：透過 `Strict-Transport-Security` header 強制瀏覽器僅使用 HTTPS。
+- **TLS 配置**：使用最新且安全的 TLS 版本與加密套件；定期檢查憑證有效性與廢止。
+- **CSP (Content Security Policy)**：雖非直接 CORS，但通過限制資源載入來源，降低 XSS 風險；配合 HTTPS 強化安全。
+- **其他 Header**：如 `X-Content-Type-Options: nosniff`、`X-Frame-Options`、`Referrer-Policy` 等提升安全防護。
+
+## 延伸思考
+
+- **CSRF 防範**：採用 CSRF Token、SameSite Cookie、雙重提交 Cookie、驗證來源等方式；理解 CORS 與 CSRF 的差異。
+- **OAuth 與跨域認證**：在 OAuth flows (如 Authorization Code) 中處理跨域回調與安全驗證，需注意重定向 URI 保護。
+- **API Gateway 與安全策略**：透過 API Gateway 進行統一 CORS 及安全檢查，集中管理跨服務的安全配置。
+- **安全測試與審計**：使用安全掃描工具、滲透測試檢查 CORS 配置與 HTTPS 設定是否存在漏洞；定期審查依賴庫和元件安全性。

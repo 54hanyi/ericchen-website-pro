@@ -1,6 +1,21 @@
 @import 'tailwindcss';
 @import 'prismjs/themes/prism-tomorrow.css';
 
+@layer base {
+  h1 {
+    @apply mt-8 text-3xl font-bold;
+  }
+  h2 {
+    @apply mt-6 text-2xl font-semibold text-cyan-400;
+  }
+  h3 {
+    @apply mt-4 text-xl font-medium;
+  }
+  h4 {
+    @apply mt-3 text-lg font-medium;
+  }
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

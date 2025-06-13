@@ -1,0 +1,70 @@
+---
+title: 'HTTP Caching'
+description: '瀏覽器快取策略與前端部署思路'
+date: '2025-06-14'
+tags: ['Performance', 'HTTP']
+---
+
+## Cache-Control
+
+- **public vs private**：決定資源能否被共享快取（CDN、代理伺服器等共享快取）或僅在單一用戶端緩存。
+- **max-age**：指定資源可緩存的秒數；對於靜態資源（CSS/JS/圖片）常設定較長時間，並使用 fingerprint（hash）命名以保證更新時失效。
+- **no-cache vs no-store**：
+  - `no-cache`：每次使用前需向伺服器 revalidate（可返回 304）。
+  - `no-store`：不緩存任何版本，適用於敏感資料或動態不宜緩存的回應。
+- **其他指令**：`must-revalidate`、`proxy-revalidate`、`s-maxage`（針對共享快取）等可依需求配置。
+- **實務做法**：
+  - 靜態資源版本化（fingerprint）搭配長快取；
+  - HTML、API 回應可設定短快取或 revalidate，以保持內容新鮮；
+  - 搭配服務端 revalidation 機制（ETag/Last-Modified）。
+
+## ETag & Last-Modified
+
+- **ETag (Entity Tag)**：伺服器為資源生成唯一標識符（如 hash）；瀏覽器下次帶 `If-None-Match`，若一致伺服器返回 304，不傳送完整資源。
+- **Last-Modified**：伺服器返回最後修改時間，瀏覽器下次帶 `If-Modified-Since`，若資源未變更返回 304。
+- **比較**：
+  - ETag 更精確，可剔除內容微小改動；成本較高（計算和存儲標識符）。
+  - Last-Modified 成本低，但對於快速多次更新場景可能不夠精細。
+- **實務做法**：
+  - 靜態資源使用 fingerprint + ETag 或直接長快取；
+  - 動態內容使用 Last-Modified 或 ETag，並配合 Cache-Control revalidation。
+  - 配合 CDN 設定，讓邊緣節點緩存並 revalidate，提升效能。
+
+## CDN 配置
+
+- **Edge Cache 與瀏覽器快取協同**：CDN 邊緣節點可緩存資源，減少伺服器負載；需設定合適的 Cache-Control 及 CDN 端有效期（如 `s-maxage`）。
+- **Invalidation／版本管理**：
+  - 靜態資源使用 fingerprint 命名，自動失效；
+  - 若不使用 fingerprint，可透過 CDN API 主動清除快取（invalidation）；
+  - 部署流程中確保新版本能更新快取，舊版本可持續提供服務。
+- **地域與 TTL**：根據全球用戶分佈設定合理 TTL；部分資源可短快取多頻更新，部分資源可長快取。
+- **HTTPS 與安全**：確保 CDN 傳輸安全；使用 HSTS、正確配置 CORS header 與快取 header。
+- **實務注意**：
+  - 監控緩存命中率與邊緣節點回源頻率；
+  - 配合 CI/CD 自動化快取更新，避免手動失誤；
+  - 設定合理的壓縮（gzip、brotli）、HTTP/2 或 HTTP/3 支援，搭配緩存策略提升效能。
+
+## 前端優化搭配
+
+- **Lazy Loading 與動態 import**：減少首次載入資源數量，搭配適當快取策略讓動態加載資源能被緩存。
+- **PWA 與 Service Worker**：
+  - 自訂快取策略（cache-first、network-first、stale-while-revalidate 等）；
+  - 離線可用場景下提前緩存必要資源；
+  - 注意更新策略，避免舊快取無法及時更新。
+- **Preload / Preconnect**：提前加載關鍵資源，讓瀏覽器在需要時快速獲取；可與 Cache-Control 協同優化。
+- **資源版本管理**：搭配 Bundler（如 webpack/Vite）的 hash 命名，自動在部署時生成新名稱並設定快取。
+- **壓縮與最小化**：確保傳輸資源已經壓縮（gzip、brotli）、去掉不必要程式碼，減少下載大小並提高緩存效率。
+
+## 測量與監控
+
+- **Lighthouse / Web Vitals**：使用 Lighthouse 評估 FCP、LCP、TTL 等指標，檢查快取策略對性能的影響。
+- **Network 面板**：在瀏覽器 DevTools Network 檢查 `200` vs `304`、cache hit/miss，確認緩存策略生效。
+- **伺服器日誌與監控**：觀察伺服器請求頻率、邊緣節點回源狀況；設置告警、定期審查快取規則。
+- **自動化測試**：CI/CD 中可包含快取 header 驗證，確保部署後正確設置；使用合成監控定期檢測核心頁面響應與緩存行為。
+
+## 延伸思考
+
+- **分層快取架構**：思考瀏覽器快取、CDN 邊緣快取、伺服器端快取（如反向代理、緩存層）的協同，設計合理層級並避免重複或衝突。
+- **動態與個性化內容**：對需要個性化或敏感資料的請求，需選擇合適的快取策略（private、no-cache 等）；必要時在伺服器端做 cache key 的區隔管理。
+- **HTTP/2 / HTTP/3 與快取**：新協議特性（多路複用、服務推送、0-RTT）對快取行為有影響，可在快取策略設計中考慮。
+- **安全與隱私**：敏感資料緩存需小心；結合 CSP、HSTS、SameSite cookie 設置，避免快取引發安全或隱私風險。

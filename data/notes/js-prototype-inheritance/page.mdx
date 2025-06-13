@@ -1,0 +1,165 @@
+---
+title: 'JavaScript 原型鏈與繼承'
+description: '整理 prototype、__proto__、class 與傳統繼承機制'
+date: '2025-06-14'
+tags: ['JavaScript', 'Prototype']
+---
+
+## prototype 與 **proto**
+
+- 每個函式（作為 constructor）有一個 `prototype` 屬性；實例物件的隱式 `[[Prototype]]`（在大多實作可透過 `__proto__` 存取）指向該 constructor.prototype。
+- 屬性查找流程：先在物件自身找，若無再沿著 prototype chain 向上查找，直到 `null` 為止。
+- 透過 `Object.getPrototypeOf(obj)` 或 `obj.__proto__`（非標準但廣泛支援）獲取原型；可用 `Object.setPrototypeOf` 動態設置（但通常不建議頻繁改動）。
+- `constructor` 屬性：當使用 `function Foo(){}` 時，`Foo.prototype.constructor === Foo`，用於識別實例對應的建構函式；若手動改 prototype，要注意重設 `constructor`。
+
+## ES5 傳統繼承
+
+- 建構函式與 prototype 方法：
+  ```js
+  function Parent(name) {
+    this.name = name;
+  }
+  Parent.prototype.greet = function () {
+    console.log('Hello, ' + this.name);
+  };
+  ```
+- 子類繼承：
+
+  ```js
+  function Child(name, age) {
+    // 呼叫 super constructor，綁定 this
+    Parent.call(this, name);
+    this.age = age;
+  }
+  // 設置 Child.prototype 指向 Parent.prototype 的副本
+  Child.prototype = Object.create(Parent.prototype);
+  // 重新指定 constructor
+  Child.prototype.constructor = Child;
+
+  Child.prototype.getAge = function () {
+    console.log(this.name + ' is ' + this.age + ' years old');
+  };
+  ```
+
+- 使用：
+  ```js
+  const c = new Child('Alice', 30);
+  c.greet(); // Hello, Alice
+  c.getAge(); // Alice is 30 years old
+  ```
+- 注意事項：
+  - `Object.create(Parent.prototype)` 建立一個新的物件，其原型指向 `Parent.prototype`，確保 Child.prototype 上可繼承 Parent 的方法。
+  - 必須在 `Child.prototype = Object.create(...)` 後，再重設 `Child.prototype.constructor = Child`，否則 `constructor` 會指向 Parent。
+  - Super constructor 呼叫 `Parent.call(this, ...)`，確保 Parent 內部對 `this` 的屬性初始化。
+  - ES5 寫法較冗長，容易出錯（忘記 call，或 prototype 設置錯誤），但有助理解底層行為。
+
+## ES6 class 語法
+
+- 語法示例：
+
+  ```js
+  class Parent {
+    constructor(name) {
+      this.name = name;
+    }
+    greet() {
+      console.log('Hello, ' + this.name);
+    }
+  }
+
+  class Child extends Parent {
+    constructor(name, age) {
+      super(name); // 呼叫父類 constructor
+      this.age = age;
+    }
+    getAge() {
+      console.log(`${this.name} is ${this.age} years old`);
+    }
+  }
+
+  const c = new Child('Bob', 25);
+  c.greet(); // Hello, Bob
+  c.getAge(); // Bob is 25 years old
+  ```
+
+- 底層仍使用 prototype chain：
+  - `extends Parent` 會自動在內部設置 `Child.prototype = Object.create(Parent.prototype)` 及修正 constructor。
+  - `super(...)` 處理呼叫父 constructor 以及 this 綁定，並在原型鏈上建立正確關聯。
+- 優點：
+  - 語法更直觀、易讀，明確表達繼承關係。
+  - 自動處理 prototype 設置與 constructor 重定向，減少手動錯誤。
+- 注意：
+  - 瞭解底層機制仍很重要，才能在需要動態或特殊情況下手動操作原型。
+  - Class 內的方法是放在 prototype 上的，並非每次實例化都複製；對記憶體與效能有益。
+
+## 混入 (Mixin) 與組合 (Composition)
+
+- JavaScript 不支援多重繼承，但可透過 Mixins 或組合模式實現類似效果。
+- **Object.assign 混入**：
+
+  ```js
+  const CanSayHi = {
+    sayHi() {
+      console.log('Hi, ' + this.name);
+    },
+  };
+
+  class Person {
+    constructor(name) {
+      this.name = name;
+    }
+  }
+  Object.assign(Person.prototype, CanSayHi);
+
+  const p = new Person('Carol');
+  p.sayHi(); // Hi, Carol
+  ```
+
+- **函式式 Mixin**：
+
+  ```js
+  function withTimestamp(Base) {
+    return class extends Base {
+      timestamp() {
+        return Date.now();
+      }
+    };
+  }
+
+  class BaseClass {}
+  class Enhanced extends withTimestamp(BaseClass) {
+    // ...
+  }
+
+  const e = new Enhanced();
+  console.log(e.timestamp());
+  ```
+
+- **組合優於繼承**：在許多場景下，使用「組合」比深度繼承更靈活，例如將多個功能模組化為獨立物件/函式，再在主物件中按需調用，而非過度建立複雜原型鏈。
+
+## 動態改 prototype 的風險
+
+- 雖然可透過 `Object.setPrototypeOf(obj, newProto)` 或直接操作 `__proto__`，但頻繁動態改變 prototype 會影響性能，且難以預測物件行為。生產環境應避免此做法，除非有特殊需求並做好效能評估。
+- 若需要類似動態功能，可考慮使用代理 (Proxy) 或其他模式，而非改變物件原型。
+
+## 無原型物件 (Pure Dictionary)
+
+- 使用 `Object.create(null)` 建立無原型的純字典物件：
+  ```js
+  const dict = Object.create(null);
+  dict.key = 'value';
+  console.log(dict.hasOwnProperty); // undefined
+  ```
+- 避免原型鏈上的屬性沖突（如 `toString`、`constructor` 等），適合用於純粹儲存鍵值對的大量查找場景。
+
+## 自我檢視與設計考量
+
+- **是否需要繼承？**
+  - 在設計物件結構時，衡量是否真的需要繼承或可用組合替代。組合（composition）通常更靈活且較易維護。
+- **了解 prototype chain 有助**：
+  - 理解 `instanceof` 如何工作：判斷物件原型鏈上是否存在指定 constructor.prototype。
+  - 理解 `hasOwnProperty`：僅檢查自身屬性，不查原型。
+  - 異常覆寫方法：若在子類上覆寫父類方法，理解原型鏈以便正確呼叫 `super.method()` 或保持原行為。
+- **效能與可讀性**：
+  - 深度原型鏈查找雖然一般性能足夠，但過深或動態頻繁變更可能影響效能。需謹慎設計。
+  - Class 語法雖簡潔，但背後原理一樣重要；能在必要時回退到手動操作 prototype，以滿足特殊需求。

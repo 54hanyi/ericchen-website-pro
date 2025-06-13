@@ -1,0 +1,33 @@
+---
+title: 'CSS Specificity 與優先順序'
+description: '整理 CSS 特異性計算與實務應用'
+date: '2025-06-14'
+tags: ['CSS', 'Specificity']
+---
+
+## Specificity 計算原則
+
+- 以 (a, b, c, d) 四元組表示：
+  - a: inline style（最高）
+  - b: ID 選擇器數量
+  - c: class、attribute、pseudo-class 數量
+  - d: element、pseudo-element 數量
+- 當比較時依序比 a, b, c, d。若相同，後定義的規則覆蓋先定義。
+
+## 避免衝突
+
+- 盡量使用較低特異性的選擇器：可採 BEM、utility-first（Tailwind）降低衝突可能。
+- 避免 over-qualified selector，例如 `div.container > ul.menu li.active a` 過於複雜。
+- CSS Modules 或 CSS-in-JS 可自動生成 scoped classname，減少全域衝突。
+- 在必要時，用 `!important` 但應盡量避免，因為後續覆蓋困難，維護成本高。
+
+## 實務建議
+
+- 若發現樣式無法生效，先在 DevTools 查看運算後的 CSS 規則和特異性，分析是哪段規則生效。
+- 儘量靠結構與 class 命名維護清晰度，而非依賴高特異性。
+- Tailwind 直接用原子 class，無需考慮複雜選擇器，適合快速開發。
+
+## 延伸思考
+
+- 某些情況需要動態插入樣式或第三方樣式覆蓋，需特別留意特異性及載入順序。
+- CSS-in-JS（如 Emotion / styled-components）通常會在 className 後帶動態 hash，避免衝突，但在多層覆蓋時仍需理解特異性。

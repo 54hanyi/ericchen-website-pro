@@ -1,0 +1,54 @@
+---
+title: 'Web 性能優化'
+description: '整理前端常見性能瓶頸與優化策略'
+date: '2025-06-14'
+tags: ['Performance', 'Frontend']
+---
+
+## 資源載入優化
+
+- **Code splitting**：動態 import 大模組或分割路由，減少首次載入資源體積。
+- **Tree shaking**：確保使用 ES Module，移除未用程式碼，降低 bundle size。
+- **Lazy loading 圖片/影片**：使用 `loading="lazy"` 或 Intersection Observer 延後載入非首屏多媒體內容。
+- **CDN**：將資源部署到 CDN，分散請求並靠近使用者，降低延遲。
+- **預載 (Preload/Prefetch)**：使用 `<link rel="preload">` 或 `<link rel="prefetch">` 提前告訴瀏覽器優先或預備加載關鍵資源。
+
+## 渲染流程優化
+
+- **避免過度重排/重繪**：減少操控 layout-trigger 屬性（如 width/height），優先使用 `transform`、`opacity` 做動畫，減少強制重排。
+- **批次 DOM 操作**：在原生 JS 中可用 DocumentFragment 批次更新；在 React 中利用虛擬 DOM 進行批次渲染以減少實際 DOM 操作次數。
+- **避免長任務 (Long Task)**：對大量計算或複雜邏輯，採用 Web Worker 或將任務拆分到多個宏任務，避免主執行緒長時間阻塞，保持 UI 流暢。
+- **CSS/渲染優化**：避免複雜選擇器影響樣式計算；使用 will-change 屬性謹慎提示，但避免濫用；預先測試關鍵渲染路徑下的性能。
+
+## 網路優化
+
+- **HTTP/2/3**：利用多路復用、Server Push（視情況）、減少資源碎片化；根據場景考慮是否合併/拆分資源。
+- **壓縮**：對文字資源（JS/CSS/HTML）使用 gzip 或 Brotli 壓縮；對圖片使用合適格式（WebP、AVIF）並適當壓縮。
+- **緩存策略**：配合 HTTP Caching 筆記，設定合理 Cache-Control、ETag/Last-Modified，提升資源命中率。
+- **網路連接管理**：優先建立關鍵連接，使用 `preconnect`、`dns-prefetch` 等優化域名解析與連接建立時間。
+- **減少請求次數**：合併小資源或使用 sprite；但同時要平衡 HTTP/2/3 下多路複用的優勢。
+
+## 記憶體管理
+
+- **避免內存洩漏**：移除不必要事件監聽器、定時器，注意閉包引用，確保不持有過期 DOM 或大型資料。
+- **列表虛擬化 (Windowing/Virtualization)**：對大量列表渲染使用 Virtualized List（如 react-window、react-virtualized），減少同時存在的 DOM 節點。
+- **資源清理**：在元件卸載或任務結束時，清理相關資源（如 Web Worker 終止、訂閱取消）。
+- **工具使用**：使用瀏覽器 DevTools Memory 快照與 Heap Profiling 分析記憶體佔用與洩漏，定位問題。
+- **避免過度保留資料**：對大型資料或結果緩存做合理過期策略，避免長時間持有大量物件。
+
+## 測量與監控
+
+- **Lighthouse / Web Vitals**：定期使用 Lighthouse 分析 FCP、LCP、TBT、CLS 等指標，識別性能瓶頸。
+- **Performance 面板**：在瀏覽器 DevTools 中錄製 Timeline，檢查長任務、重排重繪、網路請求時間等。
+- **React Profiler**：在 React 應用中使用 Profiler 分析元件重渲染次數與耗時，優化不必要的重渲染。
+- **自動化監控**：在產品中集成實時監控，如上報 key metrics（FCP、LCP），並在 CI/CD 中做性能回歸測試。
+- **用戶測試**：在真實使用者環境中測量，考慮不同網路、裝置的性能，制定優化策略。
+
+## 實務小技巧
+
+- **檢視 Bundle Size**：定期檢查打包後的大小，對依賴庫做瘦身或動態 import，避免過大影響加載時間。
+- **圖片與字體優化**：延遲載入非關鍵圖片，使用適當格式與尺寸；使用 font-display: swap 控制字體加載行為，避免 FOIT/FOUT。
+- **SSR/SSG/ISR**：利用 Next.js 等框架的 SSR/SSG/ISR 特性，減少客戶端運算，提升首屏渲染速度。
+- **CDN 與邊緣計算**：將靜態資源部署到 CDN，並考慮使用邊緣函式或服務於近用戶的邊緣計算，優化響應時間。
+- **適度預加載**：對可能即將使用的關鍵資源使用 prefetch；對關鍵渲染資源使用 preload，但避免濫用導致浪費帶寬。
+- **工具與自動化**：整合 Lighthouse CI、自動化性能測試、bundle 分析工具（如 webpack-bundle-analyzer），保持性能可觀察性和持續優化。

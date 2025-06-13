@@ -1,0 +1,50 @@
+---
+title: '前端打包工具 (Bundler) '
+description: '比較 Webpack、Vite 等打包工具原理與配置'
+date: '2025-06-14'
+tags: ['Build', 'Tooling']
+---
+
+## 基本原理
+
+- 解析模組依賴圖，將多個檔案打包成瀏覽器可執行的 bundle。
+- **Webpack**：使用 loader 處理不同資源；插件機制豐富但配置較複雜；開發時提供 HMR，生產環境進行 tree shaking、minify。
+- **Vite**：開發時利用原生 ES Module in browser 快速啟動；建置時以 Rollup 作底，產生優化 bundle；配置簡潔，啟動快速。
+- 了解底層運作有助於自訂需求，例如自訂 loader/plugin、優化打包流程。
+
+## Tree Shaking
+
+- 靜態分析 ES Module 的 import/export，移除未使用程式碼，減少 bundle size。
+- 需確保依賴庫支援 ES Module。
+- 在 TypeScript 或 Babel 設定中保持 ES Module 輸出，以便 bundler 正確分析。
+- 使用工具（如 webpack 或 Rollup 的分析插件）檢查是否有未使用程式碼未被移除。
+
+## Code Splitting
+
+- 動態 `import()`：針對大型功能分塊，按需加載。
+- Route-based splitting：如 Next.js 自動分割；在其他框架中可手動使用 React.lazy 或其他懶加載方式。
+- Webpack 的 `splitChunks` 設定：控制共用模組提取、chunk 大小等；Vite/Rollup 通常自動分割，亦可調整參數。
+- 注意：過多小 chunk 可能增加 HTTP 請求，但在 HTTP/2/3 下多路複用可降低成本；需平衡分割策略。
+
+## Dev vs Prod 差異
+
+- **開發環境 (Dev)**：強調快速反饋，使用 HMR（Hot Module Replacement）、source map；較少壓縮或優化，以加快重建速度。
+- **生產環境 (Prod)**：進行 tree shaking、minify、壓縮、cache busting（hash 命名）、bundle analysis；確保最終 bundle 大小和效能最佳。
+- Next.js 等框架封裝底層配置，但理解原理有助於在特殊場景下自訂，如修改默認行為或新增插件。
+
+## 配置管理
+
+- **Alias 與 Resolve**：配置模組別名、路徑解析，簡化 import 路徑並避免相對路徑混亂。
+- **Loader / Plugin 設定**：處理靜態資源（如圖片、SVG、CSS/SCSS）、TypeScript、Babel 等；根據專案需求選擇或自訂 loader/plugin。
+- **多入口 (Multi-entry) 或 Monorepo**：考慮共用設定、package bundling；在 monorepo 中可能需處理多個 package 的依賴與打包方式。
+- **Bundle Analysis**：使用工具（如 webpack-bundle-analyzer、rollup-plugin-visualizer）定期檢查依賴體積，找出大型庫並考慮替代方案或動態 import。
+- **環境變數與設定**：透過 dotenv、DefinePlugin 等管理不同環境配置，確保開發和生產行為一致或區分。
+
+## 實務建議
+
+- **監控 Bundle Size**：定期檢查打包後體積，對大型依賴考慮替代方案或分割加載，避免首次加載過大。
+- **深入 Debug Bundler 問題**：熟悉常見錯誤排查方法，如 HMR 失敗、模組未找到、路徑錯誤；善用日誌和分析工具。
+- **自動化與一致性**：使用 Lint/Prettier 檢查配置文件，CI 中驗證打包結果，避免人為配置不一致。
+- **最佳實踐**：關注 Tree Shaking、Code Splitting 的效果；在需要時優化 loader/plugin；平衡打包速度與最終效能。
+- **新工具和生態**：持續關注新興 bundler（如 esbuild、swc、Rome 等）的發展及其在專案中的應用場景。
+- **文件與團隊協作**：為團隊記錄打包配置約定和最佳實踐，確保新成員快速上手，減少配置相關問題。

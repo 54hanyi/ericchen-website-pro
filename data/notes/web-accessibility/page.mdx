@@ -1,0 +1,62 @@
+---
+title: 'Web Accessibility 可及性'
+description: '整理可及性實作要點'
+date: '2025-06-14'
+tags: ['Accessibility', 'Frontend']
+---
+
+## 語義化 HTML
+
+- 優先使用語義標籤：`<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, `<footer>`, `<button>` 等。
+- 盡量減少用 `div`/`span` 取代語義元素，讓輔助技術易於理解結構。
+
+## ARIA 屬性
+
+- 在自訂元件（如自訂下拉、對話框）時，補充 `role`, `aria-label`, `aria-expanded`, `aria-controls`, `aria-hidden` 等。
+- 例如漢堡選單按鈕：
+  ```jsx
+  <button aria-expanded={menuOpen} aria-controls="nav-list" aria-label="切換主選單">
+    {/* icon */}
+  </button>
+  ```
+
+## 鍵盤導航
+
+- 確保互動元素可透過 Tab 聚焦，並有明顯 focus 樣式（可用 Tailwind `focus:outline-none focus:ring` 等）。
+- 避免濫用 `tabindex`，若有自訂 focus 管理，確保邏輯清晰且不造成 Focus Trap。
+
+## 色彩對比
+
+- 文字與背景色需符合 WCAG AA/AAA 標準，避免低對比度文字難讀。
+- 使用工具（如 Chrome Lighthouse、axe）檢測色彩對比。
+
+## 動態更新提示
+
+- 當頁面內容動態變更（如通知、表單驗證訊息），可使用 `aria-live="polite"` 或 `aria-live="assertive"` 提示輔助技術更新。
+- 例如：
+  ```jsx
+  <div aria-live="polite">{message && <p>{message}</p>}</div>
+  ```
+
+## 表單可及性
+
+- 使用 `<label for="...">` 或包裹 `<input>`，確保輸入欄位有對應標籤。
+- 對於複雜元件（日期選擇器、自訂下拉），需額外 ARIA 屬性或隱藏輸入元素以保持可及性。
+- 提供明確的錯誤提示與描述，如 `aria-describedby` 連結說明訊息。
+
+## 圖片與多媒體
+
+- 圖片需提供 `alt` 屬性；若純裝飾可用空字串 `alt=""`。
+- 影片需提供字幕、文字替代與說明，並確保控制元件可透過鍵盤操作。
+
+## 測試方法
+
+- 使用鍵盤操作檢查功能可達性；使用螢幕閱讀器 (NVDA、VoiceOver) 測試界面。
+- 使用 Lighthouse、axe-core、可及性擴充套件輔助檢查。
+- 定期與真實使用者測試，收集反饋並改進。
+
+## 實務心得
+
+- 在開發初期即考慮可及性，避免事後大量重構。
+- Tailwind 可方便定義 focus 樣式及高對比色，結合可及性測試工具自動化檢查。
+- 教育團隊成員關注可及性，將可及性納入 Code Review 與測試流程。

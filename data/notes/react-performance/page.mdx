@@ -1,0 +1,64 @@
+---
+title: 'React 性能優化'
+description: '整理 React.memo、useMemo、useCallback 的實際應用'
+date: '2025-06-14'
+tags: ['React', 'Performance']
+---
+
+## React.memo
+
+- **用途**：對純展示元件進行淺比較 props，避免父元件不必要的重渲染。適合大型列表項或頻繁更新時的展示元件。
+- **注意點**：淺比較僅比較 props 的一級值，若 props 是物件或陣列，內容變化可能無法偵測。必要時可傳入自訂比較函式作深比較，但需注意效能成本。
+- **範例**：
+  ```jsx
+  const Item = React.memo(function Item({ name }) {
+    console.log('Render Item:', name);
+    return <div>{name}</div>;
+  });
+  ```
+- **適用場景**：元件渲染代價較大，且 props 結構比較穩定，能獲得效益；對小元件或頻繁變動 props，收益有限。
+
+## useMemo / useCallback
+
+- **用途**：緩存昂貴計算結果或避免重複建立函式，減少子元件不必要重新渲染。
+- **useMemo 範例**：
+  ```jsx
+  const expensiveValue = useMemo(() => computeHeavy(data), [data]);
+  ```
+- **useCallback 範例**：
+  ```jsx
+  const handleClick = useCallback(() => {
+    doSomething(id);
+  }, [id]);
+  <Child onClick={handleClick} />;
+  ```
+- **注意事項**：
+  - 若依賴頻繁改變或計算開銷低，useMemo/useCallback 反而增加維護複雜度與記憶體使用。
+  - 常見組合：當子元件經 React.memo 包裹，且需要傳遞 callback，才有意義。
+  - 不建議過度包覆所有函式，需先用 Profiler 確認瓶頸。
+
+## 過度優化風險
+
+- **可讀性降低**：大量 useMemo/useCallback 和 React.memo 使程式碼複雜，增加心智負擔。
+- **維護成本**：若優化策略頻繁改動，導致依賴陣列頻繁修改，容易出錯。
+- **不必要優化**：在沒有明確性能問題前，不要盲目使用，應先用 React Profiler 或 Performance 工具定位瓶頸，再決定是否優化。
+
+## 列表渲染
+
+- **key 使用**：避免使用 index 作為 key，尤其在列表順序或元素插入/刪除時，可能導致狀態錯亂。
+- **虛擬化**：對長列表可使用列表虛擬化庫（如 react-window、react-virtualized），減少同時渲染的 DOM 節點數量，提升滾動性能。
+- **分割列表項元件**：將列表項拆成獨立元件並用 React.memo 包裹，配合合適的 key，可降低整列表重渲染。
+
+## 其他工具
+
+- **React Profiler**：分析元件渲染次數與耗時，找出重複渲染或耗時較高的元件。
+- **Chrome DevTools Performance 面板**：錄製 Timeline，觀察長任務、渲染與排版時間，定位性能瓶頸。
+- **Lighthouse / Web Vitals**：評估整體應用性能指標，如 FCP、LCP、TBT、CLS。
+- **Bundle 分析**：使用工具（如 webpack-bundle-analyzer）檢查 bundle size，減少依賴體積，提升加載速度。
+
+## 實務心得
+
+- **拆分元件**：若某部分頻繁卡頓，可將大元件拆分成小元件，並依據 props 決定是否包 React.memo，提升局部更新效率。
+- **Context 更新影響**：Context 值變更會觸發所有消費元件重渲染，可考慮拆分 Context 或使用 useMemo/useCallback 以減少不必要渲染。
+- **先測量再優化**：使用 Profiler 定位明確問題，再針對性地使用 React.memo 或 useMemo；避免全局性過度優化。
+- **監控和迭代**：定期檢查性能指標及 bundle size，並在開發過程中養成測量習慣，保持性能可觀察性和持續優化。

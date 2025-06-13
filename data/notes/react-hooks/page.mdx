@@ -1,0 +1,76 @@
+---
+title: '常用 React Hooks 原理與實踐'
+description: '整理 useState, useEffect, useMemo 等原理與使用建議'
+date: '2025-06-14'
+tags: ['React', 'Hooks']
+---
+
+## 基本原理
+
+- React 內部維護 hooks list，基於呼叫順序管理每個 hook 的 state/effect。
+- 因此 Hooks 規則：只能在函式元件或自訂 Hook 最上層呼叫，且呼叫順序不可變。
+
+## useState
+
+- 返回狀態值與 setter；setter 會觸發重新渲染，下一次渲染拿到最新 state。
+- 可以傳入函式以延遲初始化：`const [state, setState] = useState(() => initialValue);`。
+- 注意 setter 可接受函式形式更新前一個 state：`setState(prev => newValue)`。
+
+## useEffect
+
+- 副作用排程在 render 完成後執行，可以執行清理邏輯（cleanup）於下一次 effect 或 unmount。
+- 依賴陣列決定是否重新執行；若空陣列，僅在 mount/unmount；若無陣列，每次渲染均執行。
+- 注意避免在 effect 中無限循環呼叫 setState，通常需確認依賴陣列完整。
+- 範例：
+  ```js
+  useEffect(() => {
+    const id = setInterval(() => {
+      // do something
+    }, 1000);
+    return () => clearInterval(id);
+  }, []);
+  ```
+
+## useMemo / useCallback
+
+- `useMemo` 用於緩存昂貴計算結果：`const memoValue = useMemo(() => computeExpensive(), [dep1, dep2]);`
+- `useCallback` 用於緩存函式，避免子元件不必要重渲染：`const memoFn = useCallback(() => { ... }, [deps]);`
+- 過度使用可能增加複雜度，需衡量計算成本與依賴變更頻率；對輕量計算或頻繁變化依賴，收益可能較低。
+
+## 自訂 Hook
+
+- 可將邏輯抽離成可重用的函式，比如資料抓取、表單狀態管理等。自訂 Hook 內可呼叫其他 Hook。
+- 命名一般以 `useXxx` 開頭，遵守 Hook 規則。
+- 範例：
+  ```js
+  function useFetch(url) {
+    const [data, setData] = useState(null);
+    useEffect(() => {
+      let canceled = false;
+      fetch(url)
+        .then((res) => res.json())
+        .then((json) => {
+          if (!canceled) setData(json);
+        });
+      return () => {
+        canceled = true;
+      };
+    }, [url]);
+    return data;
+  }
+  ```
+
+## 實務建議
+
+- 清楚分離視圖與邏輯：把副作用、資料 fetch、事件監聽等放在 `useEffect`，自訂 Hook 管理邏輯，元件聚焦渲染。
+- 注意 dependencies：Lint 工具常提示加入缺少依賴，需確認不會引發多餘執行或 missing dependency 問題；必要時使用 `useCallback`、`useMemo` 或自訂比較邏輯。
+- React Profiler 協助找出重複渲染瓶頸，再決定是否加 `memo`、`useMemo` 等優化。
+- 避免在渲染期間執行重運算或副作用，確保效能；將非同步邏輯放在 effect 或自訂 Hook。
+- 在多人協作中，統一 Hook 使用規範與最佳實踐，減少誤用導致錯誤或效能問題。
+
+## 延伸主題
+
+- React 18 的 Concurrent Features：`startTransition`、`useTransition`、`useDeferredValue` 等背後原理與使用方式。
+- `useReducer` vs `useState` 在複雜狀態管理的取捨；可結合 `useContext` 或第三方狀態管理庫設計可維護的狀態邏輯。
+- 自訂 Hook 的測試：如何撰寫單元測試或集成測試以驗證 Hook 行為。
+- Hooks 與外部庫整合：如 React Query、SWR 等 Hook-based 資料抓取庫原理與使用建議。
