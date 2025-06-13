@@ -49,7 +49,6 @@ export default function NavBar() {
               d="M6 18L18 6M6 6l12 12"
             />
           ) : (
-            // 漢堡圖示 (三條線)
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
