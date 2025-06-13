@@ -6,7 +6,7 @@ import ScrollToTop from '@/components/ScrollToTop';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'EricChen.Dev',
+  title: 'EricChen.Website',
   description: '展示 React、TypeScript、Next.js 等前端作品與實作筆記',
   openGraph: {
     title: 'Eric 的技術展示網站',
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     siteName: 'Eric 技術展示網站',
     images: [
       {
-        url: 'https://你的網址.vercel.app/og-cover.png', // 放在 public 資料夾
+        url: 'https://你的網址.vercel.app/og-cover.png',
         width: 1200,
         height: 630,
       },
