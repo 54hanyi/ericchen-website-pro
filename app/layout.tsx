@@ -6,7 +6,7 @@ import ScrollToTop from '@/components/ScrollToTop';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Eric Chen 技術站',
+  title: 'EricChen.Dev',
   description: '展示 React、TypeScript、Next.js 等前端作品與實作筆記',
   openGraph: {
     title: 'Eric 的技術展示網站',
@@ -33,7 +33,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="zh-Hant">
       <body className="flex flex-col min-h-screen bg-black text-white font-sans">
         <NavBar />
-        <main className="flex-1">{children}</main> {/* 重點在 flex-1 */}
+        <main className="flex-1">{children}</main>
         <Footer />
         <ScrollToTop />
       </body>
