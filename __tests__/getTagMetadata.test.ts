@@ -1,5 +1,4 @@
-// __tests__/getTagMetadata.test.ts
-import { getTagMetadata } from '../lib/getTagMetadata'; // 根據實際路徑調整
+import { getTagMetadata } from '../lib/getTagMetadata';
 
 describe('getTagMetadata', () => {
   const origEnv = process.env;
@@ -15,7 +14,6 @@ describe('getTagMetadata', () => {
   });
 
   it('當未設定 NEXT_PUBLIC_SITE_URL 時，使用 default siteName 並回傳正確 metadata', async () => {
-    // Arrange
     const tag = 'testTag';
     const decodedTag = 'testTag';
     const siteName = 'http://localhost:3000';
@@ -23,7 +21,6 @@ describe('getTagMetadata', () => {
       `#${decodedTag}`
     )}`;
 
-    // Act
     const metadata = await getTagMetadata(tag);
 
     // Assert: 基本欄位
@@ -112,7 +109,6 @@ describe('getTagMetadata', () => {
       if (Array.isArray(twImages)) {
         expect(twImages[0]).toBe(expectedOgImageUrl);
       }
-      // 不檢查 twitter.card
     }
   });
 
@@ -154,7 +150,6 @@ describe('getTagMetadata', () => {
       if (Array.isArray(twImages)) {
         expect(twImages[0]).toBe(expectedOgImageUrl);
       }
-      // 不檢查 twitter.card
     }
   });
 });
