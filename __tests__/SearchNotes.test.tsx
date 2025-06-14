@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import SearchNotes from '../components/SearchNotes'; // ← 根據實際路徑調整
+import SearchNotes from '../components/SearchNotes';
 import { Note } from '@/types/note';
 
 // mock next/link: 使 <Link> 在測試中渲染成 <a>
