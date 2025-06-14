@@ -15,7 +15,7 @@ export default function NotesList({ notes, keyword }: { notes: Note[]; keyword: 
             </h2>
           </Link>
           <p className="text-gray-400 text-sm mt-1">
-            <HighlightText text={note.description} keyword={keyword} />
+            <HighlightText text={note.description ?? ''} keyword={keyword} />
           </p>
 
           {Array.isArray(note.tags) && note.tags.length > 0 && (

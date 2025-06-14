@@ -16,7 +16,7 @@ export default function SearchNotes({ notes }: { notes: Note[] }) {
     const lowerSearch = search.toLowerCase();
     return (
       note.title.toLowerCase().includes(lowerSearch) ||
-      note.description.toLowerCase().includes(lowerSearch) ||
+      note.description?.toLowerCase().includes(lowerSearch) ||
       (note.tags && note.tags.some((tag) => tag.toLowerCase().includes(lowerSearch)))
     );
   });
