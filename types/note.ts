@@ -3,7 +3,7 @@ import type { Frontmatter } from './frontmatter';
 export type Note = {
   slug: string;
   title: string;
-  description: string;
+  description?: string;
   tags?: string[];
   date?: string;
 };

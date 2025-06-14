@@ -12,10 +12,10 @@ jest.mock('next/cache', () => ({
 
 import fs from 'fs/promises';
 import path from 'path';
-import { getAllNotes } from '../utils/getAllNotes'; // 確認路徑正確
+import { getAllNotes } from '../utils/getAllNotes';
 import { compileMDX } from 'next-mdx-remote/rsc';
 
-jest.mock('fs/promises'); // mock fs
+jest.mock('fs/promises');
 const mockedFs = fs as jest.Mocked<typeof fs>;
 // compileMDX 已在上方 jest.mock，所以可以 cast
 const mockedCompileMDX = compileMDX as jest.MockedFunction<typeof compileMDX>;
