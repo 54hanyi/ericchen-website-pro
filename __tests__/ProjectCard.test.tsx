@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import '@testing-library/jest-dom';
 import React from 'react';
@@ -32,19 +33,34 @@ jest.mock('next/link', () => {
   return NextLinkMock;
 });
 
-// mock next/image，使其渲染為 <img>
+// 模擬 next/image，使其渲染成普通 <img>，並剝離 Next.js Image 特有屬性
 jest.mock('next/image', () => {
-  interface ImageMockProps {
-    src: string;
-    alt: string;
-    // 可能還有其他 props，但測試中不需具體型別
-    [key: string]: unknown;
-  }
-  const ImageMock: React.FC<ImageMockProps> = ({ src, alt, ...rest }) => {
-    return <img src={src} alt={alt} {...rest} />;
+  return {
+    __esModule: true,
+    default: (props: {
+      src: string;
+      alt: string;
+      fill?: boolean | string;
+      width?: string | number;
+      height?: string | number;
+      sizes?: string;
+      // 可能還有其他 Next/Image 特有 props，如 priority、placeholder 等
+      [key: string]: any;
+    }) => {
+      // 解構掉 Next.js Image 特有屬性，避免傳給 <img> 造成警告
+      const { src, alt, fill, width, height, sizes, quality, priority, placeholder, ...rest } =
+        props;
+      void fill;
+      void width;
+      void height;
+      void sizes;
+      void quality;
+      void priority;
+      void placeholder;
+      // 僅將 src、alt 及剩餘普通屬性透傳給 <img>
+      return <img src={src} alt={alt} {...rest} />;
+    },
   };
-  ImageMock.displayName = 'ImageMock';
-  return ImageMock;
 });
 
 // mock framer-motion 的 motion.div 為普通 div
