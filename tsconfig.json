@@ -5,15 +5,16 @@
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
-    "noEmit": true,
+    "noEmit": false,
+    "outDir": "dist",
     "esModuleInterop": true,
     "module": "esnext",
-
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "types": ["jest", "node", "react", "react-dom"],
     "plugins": [
       {
         "name": "next"
@@ -21,17 +22,15 @@
     ],
     "paths": {
       "@/*": ["./*"]
-    },
-    "types": ["jest", "node", "react", "react-dom"]
+    }
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "scripts/generate-sitemap.ts",
     "tailwind.config.js",
     "jest.config.cjs"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules/@types/mdx", "node_modules"]
 }

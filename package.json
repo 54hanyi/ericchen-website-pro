@@ -4,11 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "npm run generate:sitemap && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
-    "generate:sitemap": "node --loader ts-node/esm scripts/generate-sitemap.ts",
     "format": "prettier --write ."
   },
   "dependencies": {
@@ -16,7 +15,6 @@
     "@mdx-js/react": "^3.1.0",
     "@next/mdx": "^15.3.2",
     "@tailwindcss/typography": "^0.5.16",
-    "@types/mdx": "^2.0.13",
     "@vercel/og": "^0.6.8",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.16.0",
