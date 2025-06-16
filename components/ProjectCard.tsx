@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, type Variants, type Transition } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Project } from '../data/projects';
@@ -14,16 +14,18 @@ interface ProjectCardProps {
 export default function ProjectCard({ project, index, onClick }: ProjectCardProps) {
   const fromX = index % 2 === 0 ? -1000 : 1000;
 
-  const cardVariants = {
+  const cardTransition: Transition = {
+    type: 'tween',
+    ease: 'linear',
+    duration: 0.4,
+  };
+
+  const cardVariants: Variants = {
     hidden: { opacity: 0, x: fromX },
     show: {
       opacity: 1,
       x: 0,
-      transition: {
-        type: 'tween',
-        ease: 'linear',
-        duration: 0.4,
-      },
+      transition: cardTransition,
     },
   };
 
@@ -31,6 +33,8 @@ export default function ProjectCard({ project, index, onClick }: ProjectCardProp
     <motion.div
       onClick={onClick}
       variants={cardVariants}
+      initial="hidden"
+      animate="show"
       whileHover={{
         scale: 1.02,
         boxShadow: '0px 10px 30px rgba(0, 255, 255, 0.15)',
