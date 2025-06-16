@@ -70,8 +70,8 @@ Eric Chen 個人網站旨在：
 
 ## 專案結構概覽
 
-```
-.
+```txt
+
 ├── app
 │   ├── layout.tsx
 │   ├── page.tsx
