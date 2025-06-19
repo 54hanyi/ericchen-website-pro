@@ -1,0 +1,83 @@
+---
+title: 'Zod #8：Zod vs Yup vs Joi 實戰比較與選型建議'
+description: '比較三大主流表單與資料驗證工具：Zod、Yup、Joi，說明優缺點、效能與適用情境。'
+tags: ['zod', 'yup', 'joi', '驗證工具比較']
+date: '2025-06-17'
+---
+
+# 🏁 Zod #8：Zod vs Yup vs Joi 實戰比較與選型建議
+
+Zod 是現代前端主流驗證工具之一，但市場上仍有其他選擇，如 **Yup、Joi**。本章將從使用體驗、效能、整合性等方面分析三者。
+
+## ⚔️ 三者簡介
+
+- **Zod**：TypeScript 原生設計、型別安全、驗證與型別同步
+- **Yup**：React Hook Form 官方推薦之一，語法簡潔、社群廣
+- **Joi**：Node.js / Hapi 框架原生工具，偏後端導向
+
+## 🔍 語法比較範例
+
+**Zod**
+
+```ts
+const schema = z.object({
+  name: z.string().min(2),
+  age: z.number().int(),
+});
+```
+
+**Yup**
+
+```ts
+const schema = yup.object({
+  name: yup.string().min(2),
+  age: yup.number().integer(),
+});
+```
+
+**Joi**
+
+```ts
+const schema = Joi.object({
+  name: Joi.string().min(2),
+  age: Joi.number().integer(),
+});
+```
+
+## ✅ Zod 優點
+
+- ✅ 與 TypeScript 完美整合，能 `z.infer<...>` 推導型別
+- ✅ 支援 `.safeParse()`、`.refine()`、`.superRefine()` 客製邏輯
+- ✅ 適合在前後端共用 schema 模組
+- ✅ 無外部依賴，效能佳
+
+## ⚠️ Zod 限制
+
+- ❗ 無法從型別反推 schema（需手動撰寫）
+- ❗ 相較 Yup 在某些深層巢狀驗證語法略顯繁瑣
+
+## ✅ Yup 優點
+
+- ✅ 語法直覺，與 React Hook Form 整合佳
+- ✅ 支援異步驗證（例如 remote email 檢查）
+
+## ⚠️ Yup 限制
+
+- ❗ 與 TypeScript 型別同步需另行處理（如 ts-to-yup）
+- ❗ 錯誤訊息格式化不如 Zod 清晰
+
+## ✅ Joi 優點
+
+- ✅ 適合 Node.js 後端專案
+- ✅ 錯誤細節完整，內建許多驗證工具
+
+## ⚠️ Joi 限制
+
+- ❗ 檔案偏大，不適合瀏覽器使用
+- ❗ 型別整合差，對 TS 開發不夠友善
+
+## 🔚 小結建議清單
+
+- 🧑‍💻 **前端 + TypeScript 專案首選**：Zod ✅
+- 💡 **已有 Yup 經驗 + 快速整合**：Yup 👍
+- 🧰 **Node.js / 後端驗證**：Joi 適合後端 ☁️

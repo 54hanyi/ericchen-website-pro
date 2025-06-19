@@ -1,0 +1,94 @@
+---
+title: 'Zod #2：常見型別限制與 Optional 處理'
+description: '介紹 Zod 中如何為 string、number 等型別加入限制條件，並處理 optional、nullable、default 等情況。'
+tags: ['zod', 'typescript', '表單驗證', 'optional']
+date: '2025-06-17'
+---
+
+# 📘 Zod #2：常見型別限制與 Optional 處理
+
+本章節介紹 Zod 中 **限制條件的設置**，例如字串長度、數值範圍，以及如何處理「欄位不是必填」的情況（optional、nullable、default）。
+
+## ✨ 為型別加入限制條件（Refinement）
+
+### 🔹 字串限制（min / max / regex）
+
+```ts
+z.string().min(3); // 至少 3 個字
+z.string().max(10); // 最多 10 個字
+z.string().regex(/^A/); // 必須以 A 開頭
+```
+
+### 🔹 數值限制（min / max / int / positive / nonnegative）
+
+```ts
+z.number().min(0); // 最小值為 0
+z.number().max(100); // 最大值為 100
+z.number().int(); // 必須為整數
+z.number().positive(); // 大於 0
+z.number().nonnegative(); // 大於等於 0
+```
+
+## ✅ optional()：欄位可以不出現
+
+```ts
+const schema = z.object({
+  name: z.string(),
+  nickname: z.string().optional(),
+});
+
+schema.parse({ name: 'Eric' }); // ✅ OK
+schema.parse({ name: 'Eric', nickname: '小艾' }); // ✅ OK
+```
+
+## ✅ default()：設定預設值
+
+```ts
+const schema = z.object({
+  level: z.number().default(1),
+});
+
+schema.parse({}); // ✅ 回傳 { level: 1 }
+schema.parse({ level: 5 }); // ✅ 回傳 { level: 5 }
+```
+
+## ✅ nullable()：欄位可以是 null（但仍需出現）
+
+```ts
+const schema = z.object({
+  email: z.string().email().nullable(),
+});
+
+schema.parse({ email: null }); // ✅ OK
+schema.parse({ email: 'a@b.com' }); // ✅ OK
+```
+
+> ☝️ 注意：`nullable()` 不等於 `optional()`，如果該欄位未出現會錯！
+
+## 🚨 optional() vs nullable() 差異
+
+### 🔹 optional()
+
+- 意義：欄位「可以不出現」
+- 合法範例：`{}`
+
+### 🔹 nullable()
+
+- 意義：欄位「一定要出現，但值可以是 null」
+- 合法範例：`{ email: null }`
+
+### 💡 合併使用
+
+你可以組合使用 `.optional()` 與 `.nullable()`：
+
+```ts
+z.string().optional().nullable(); // 可不出現、或為 null、或為字串
+```
+
+## ✅ 小結
+
+- 使用 `.min()`, `.max()` 等限制字串或數值範圍
+- `.optional()`：欄位可不出現
+- `.nullable()`：欄位必須出現，但值可為 null
+- `.default()`：提供預設值
+- 可以自由組合使用，達成靈活的 schema 驗證

@@ -1,0 +1,117 @@
+---
+title: 'Zod #6：React 表單整合與錯誤提示'
+description: '學習如何將 Zod 搭配 React 表單使用，整合驗證、錯誤訊息顯示，與常見的 React Hook Form 實作方式。'
+tags: ['zod', 'react', 'form', '驗證整合']
+date: '2025-06-17'
+---
+
+# 📘 Zod #6：React 表單整合與錯誤提示
+
+Zod 可以與 React 表單整合，常搭配的工具是 [`react-hook-form`](https://react-hook-form.com/)。本章將介紹兩種方式：
+
+1. ✅ 手動驗證 + 自行顯示錯誤訊息
+2. ✅ 整合 `react-hook-form` + `zodResolver` 自動驗證
+
+## ✅ 手動驗證：用 `safeParse()` 驗證輸入
+
+```tsx
+import { useState } from 'react';
+import { z } from 'zod';
+
+const schema = z.object({
+  name: z.string().min(2, '名字至少 2 個字'),
+  age: z.number().min(18, '年齡需滿 18 歲'),
+});
+
+export default function MyForm() {
+  const [formData, setFormData] = useState({ name: '', age: '' });
+  const [error, setError] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const parsed = schema.safeParse({
+      name: formData.name,
+      age: Number(formData.age),
+    });
+
+    if (!parsed.success) {
+      setError(parsed.error.format());
+    } else {
+      console.log('驗證成功！', parsed.data);
+      setError('');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        placeholder="名字"
+        value={formData.name}
+        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+      />
+      <input
+        placeholder="年齡"
+        value={formData.age}
+        onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+      />
+      <button type="submit">送出</button>
+
+      {error?.name && <p>{error.name._errors[0]}</p>}
+      {error?.age && <p>{error.age._errors[0]}</p>}
+    </form>
+  );
+}
+```
+
+## 🔄 搭配 React Hook Form + Zod
+
+### 📦 安裝套件
+
+```bash
+npm install react-hook-form @hookform/resolvers zod
+```
+
+### 🧩 使用 zodResolver
+
+```tsx
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+const schema = z.object({
+  email: z.string().email(),
+});
+
+export default function ZodForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(schema),
+  });
+
+  const onSubmit = (data) => {
+    console.log('成功送出：', data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input {...register('email')} placeholder="Email" />
+      {errors.email && <p>{errors.email.message}</p>}
+
+      <button type="submit">提交</button>
+    </form>
+  );
+}
+```
+
+## ✅ 小結
+
+- Zod 可透過 `safeParse()` 驗證表單資料
+- 搭配 `react-hook-form` 使用 `zodResolver` 最簡便
+- 錯誤格式可由 `format()` 或 `formState.errors` 取得
+- 建議用 TypeScript + z.infer 自動補齊型別
+
+👉 下一章，我們會介紹如何測試 Zod schema，並在前後端整合時作為 API 入口驗證！

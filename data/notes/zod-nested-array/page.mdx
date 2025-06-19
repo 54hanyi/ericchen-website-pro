@@ -1,0 +1,79 @@
+---
+title: 'Zod #3：巢狀物件與陣列驗證'
+description: '介紹如何使用 Zod 驗證巢狀物件、陣列資料與複合結構，建立結構化 schema。'
+tags: ['zod', 'typescript', '巢狀物件', '陣列驗證']
+date: '2025-06-17'
+---
+
+# 📘 Zod #3：巢狀物件與陣列驗證
+
+Zod 不只可以驗證單層資料，還能支援 **巢狀物件、陣列結構、多層嵌套型別**。這一章會教你建立結構化的 schema！
+
+## 🧱 巢狀物件驗證
+
+你可以用 `z.object()` 裡再放入 `z.object()` 來建立巢狀結構：
+
+```ts
+const userSchema = z.object({
+  name: z.string(),
+  profile: z.object({
+    age: z.number(),
+    bio: z.string().optional(),
+  }),
+});
+
+userSchema.parse({
+  name: 'Eric',
+  profile: {
+    age: 28,
+    bio: '前端工程師',
+  },
+});
+```
+
+## 🧾 陣列驗證
+
+使用 `z.array()` 包住元素的型別即可：
+
+```ts
+const tagSchema = z.object({
+  name: z.string(),
+});
+
+const postSchema = z.object({
+  title: z.string(),
+  tags: z.array(tagSchema), // 陣列中的每個元素都要符合 tagSchema
+});
+```
+
+```ts
+postSchema.parse({
+  title: 'Zod 入門教學',
+  tags: [{ name: 'zod' }, { name: 'typescript' }],
+});
+```
+
+## 🧮 基本型別陣列驗證
+
+```ts
+z.array(z.string()); // 字串陣列
+z.array(z.number().min(1)); // 每個數字皆 ≥ 1
+```
+
+## 🚨 陣列元素錯誤格式
+
+Zod 會詳細指出是哪一筆陣列錯誤：
+
+```ts
+const schema = z.array(z.object({ id: z.number().int() }));
+
+schema.safeParse([{ id: 1 }, { id: 'a' }]);
+// => 第 2 筆錯誤：id 不是整數
+```
+
+## ✅ 小結
+
+- `z.object({})` 可巢狀再巢狀，支援多層資料結構
+- `z.array()` 可驗證陣列元素格式與數量限制
+- 搭配 `.optional()`、`.min()` 使用可建立彈性清單欄位
+- Zod 的錯誤訊息會指出陣列中哪一筆錯誤

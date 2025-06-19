@@ -1,0 +1,148 @@
+---
+title: 'Zustand 教學：從入門到常用技巧'
+description: '整理 Zustand 的使用概念、範例、常見方法與應用情境，讓你快速掌握 React 狀態管理新寵。'
+tags: ['zustand', 'state-management', 'React']
+date: '2025-06-17'
+---
+
+# 🐻 Zustand 教學：從入門到常用技巧
+
+Zustand 是一個輕量又強大的 React 狀態管理函式庫，不需 Provider、不寫 reducer，也能靈活處理全域狀態。
+
+## ✅ 1. Zustand 是什麼？
+
+Zustand 是一個用來管理 React 中**共享狀態**的工具：
+
+- ✅ 沒有 Provider，使用簡單
+- ✅ 支援中大型應用切片管理（slice）
+- ✅ 支援 persist 儲存到 localStorage
+- ✅ 支援 Devtools、middleware 擴充
+
+## 🚀 2. 安裝
+
+```bash
+npm install zustand
+```
+
+## 📦 3. 建立 store（基本範例）
+
+```ts
+import { create } from 'zustand';
+
+type BearStore = {
+  count: number;
+  increase: () => void;
+};
+
+export const useBearStore = create<BearStore>((set) => ({
+  count: 0,
+  increase: () => set((state) => ({ count: state.count + 1 })),
+}));
+```
+
+## 🧪 4. 在元件中使用
+
+```tsx
+function BearCounter() {
+  const count = useBearStore((s) => s.count);
+  const increase = useBearStore((s) => s.increase);
+
+  return (
+    <div>
+      <p>目前熊的數量是 {count}</p>
+      <button onClick={increase}>增加一隻熊</button>
+    </div>
+  );
+}
+```
+
+## 🔧 5. 常用 API
+
+| 方法                 | 說明                         |
+| -------------------- | ---------------------------- |
+| `create(fn)`         | 建立一個 store               |
+| `set(fn)`            | 設定新狀態                   |
+| `get()`              | 取得目前狀態值               |
+| `subscribe()`        | 訂閱狀態變化（非元件用）     |
+| `useStore(selector)` | 在元件中取值（可避免重渲染） |
+
+## 🧩 6. 切片（Slice）管理多狀態
+
+```ts
+// authSlice.ts
+export const createAuthSlice = (set) => ({
+  user: null,
+  login: (user) => set({ user }),
+  logout: () => set({ user: null }),
+});
+```
+
+```ts
+// store.ts
+import { create } from 'zustand';
+import { createAuthSlice } from './authSlice';
+
+export const useStore = create()((...a) => ({
+  ...createAuthSlice(...a),
+}));
+```
+
+## 💾 7. 使用 persist 儲存登入資訊
+
+```ts
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
+export const useAuthStore = create(
+  persist(
+    (set) => ({
+      user: null,
+      login: (user) => set({ user }),
+      logout: () => set({ user: null }),
+    }),
+    {
+      name: 'auth-storage', // localStorage 的 key
+    }
+  )
+);
+```
+
+## 🧠 8. 實戰：登入功能 store
+
+```ts
+// loginStore.ts
+import { create } from 'zustand';
+
+type LoginState = {
+  username: string;
+  isLoggedIn: boolean;
+  login: (name: string) => void;
+  logout: () => void;
+};
+
+export const useLoginStore = create<LoginState>((set) => ({
+  username: '',
+  isLoggedIn: false,
+  login: (name) => set({ username: name, isLoggedIn: true }),
+  logout: () => set({ username: '', isLoggedIn: false }),
+}));
+```
+
+```tsx
+// LoginForm.tsx
+const login = useLoginStore((s) => s.login)
+<button onClick={() => login('Eric')}>登入</button>
+```
+
+```tsx
+// UserInfo.tsx
+const { username, isLoggedIn, logout } = useLoginStore();
+```
+
+## 🧠 Zustand 適用情境
+
+- ✅ **登入者資料共享**：非常推薦使用 Zustand
+- ✅ **modal / sidebar 狀態控制**：輕巧又好用
+- ✅ **購物車狀態 / 收藏清單**：推薦使用 Zustand 管理
+- ❌ **表單欄位輸入狀態**：不建議，用 `useState` 更直覺
+- ❌ **Server API 資料**：請使用 React Query（更擅長處理資料同步與快取）

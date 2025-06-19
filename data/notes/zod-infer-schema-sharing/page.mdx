@@ -1,0 +1,84 @@
+---
+title: 'Zod #5：與 TypeScript 型別互轉與共用 Schema 設計'
+description: '學會如何從 Zod schema 推導 TypeScript 型別，或從型別反推驗證，並建立共用 schema 模組。'
+tags: ['zod', 'typescript', '型別互轉', '共用 schema']
+date: '2025-06-17'
+---
+
+# 📘 Zod #5：與 TypeScript 型別互轉與共用 Schema 設計
+
+Zod 最強大的特色之一就是與 TypeScript 型別系統整合得非常好。我們可以：
+
+1. ✅ 從 Zod schema 推導出 TypeScript 型別
+2. ✅ 使用共用 schema 來同步型別與驗證
+3. ✅ 模組化 schema，供 API / 表單 / 後端 共用
+
+## 🔁 從 Schema 推導 TypeScript 型別
+
+```ts
+const userSchema = z.object({
+  name: z.string(),
+  age: z.number(),
+});
+
+type User = z.infer<typeof userSchema>;
+
+// 推導出來的型別等同於：
+/*
+type User = {
+  name: string;
+  age: number;
+}
+*/
+```
+
+- `z.infer<typeof schema>`：將 schema 自動轉換成 TypeScript 型別
+- 避免手動維護型別，保持同步！
+
+## 🔁 反向定義：從型別轉回 schema？
+
+Zod 並**不支援從 TS 型別反推 schema**，但你可以寫輔助工具來達成，例如搭配 `ts-to-zod` CLI 工具（非官方）。
+
+## 📦 共用 schema 的應用場景
+
+### 🔹 在 API 與前端共用
+
+```ts
+// schemas/user.ts
+export const userSchema = z.object({
+  id: z.string(),
+  email: z.string().email(),
+  name: z.string().min(2),
+});
+
+// 前端使用 z.infer 拿型別
+export type User = z.infer<typeof userSchema>;
+
+// 後端驗證
+const result = userSchema.safeParse(req.body);
+```
+
+這樣可以保證「型別定義 = 驗證規則」，只要改一個地方，兩邊都同步！
+
+## 🧠 進一步封裝 schema 為 function
+
+```ts
+// utils/schema.ts
+export const createPasswordSchema = () =>
+  z
+    .string()
+    .min(6)
+    .refine((val) => /[A-Z]/.test(val), {
+      message: '需含至少一個大寫字母',
+    });
+```
+
+讓 schema 模組更彈性可重用。
+
+## ✅ 小結
+
+- 使用 `z.infer<typeof schema>` 可推導出 TypeScript 型別
+- 可將 schema 模組化、共用於 API、表單、後端驗證
+- 建議所有 API request/response 統一用 Zod 驗證與型別
+
+👉 下一章，我們會實戰整合 React 表單 + Zod，驗證輸入資料並呈現錯誤提示。

@@ -1,0 +1,126 @@
+---
+title: 'React Query 常用方法總整理'
+description: '整理 @tanstack/react-query 的所有常用方法與使用情境，適合中大型 React 專案快速查閱。'
+tags: ['react-query', 'TanStack', '資料同步', '快取管理', '狀態管理']
+date: '2025-06-16'
+---
+
+# 🧠 React Query 常用方法總整理
+
+React Query 是現代 React 專案中非常強大的「伺服器狀態管理工具」，本篇整理最常用的 Hook 與函式對照、使用情境、實務應用方式。
+
+## 📦 1. useQuery – 查詢資料（GET）
+
+```tsx
+import { useQuery } from '@tanstack/react-query';
+
+const { data, isLoading, error } = useQuery({
+  queryKey: ['todos'],
+  queryFn: () => fetch('/api/todos').then((res) => res.json()),
+});
+```
+
+- `queryKey`: 快取的唯一鍵值
+- `queryFn`: 查詢資料的方法（可搭配 axios/fetch）
+- 自動處理：`isLoading`, `error`, `data`
+
+## 🧨 2. useMutation – 修改/送出資料（POST / PUT / DELETE）
+
+```tsx
+const mutation = useMutation({
+  mutationFn: (newTodo) => axios.post('/api/todos', newTodo),
+  onSuccess: () => {
+    queryClient.invalidateQueries(['todos']); // 更新快取
+  },
+});
+```
+
+- `mutationFn`: 要送出的 API 函式
+- `onSuccess`: 成功後做什麼（例如重新整理清單）
+
+## 🧠 3. useQueryClient – 快取操作入口
+
+```tsx
+const queryClient = useQueryClient();
+
+queryClient.invalidateQueries(['todos']); // 重新取得
+queryClient.setQueryData(['todos'], data); // 手動設資料
+queryClient.getQueryData(['todos']); // 拿快取資料
+queryClient.removeQueries(['todos']); // 清除快取
+```
+
+## 🧰 4. 快取函式常用對照表
+
+| 函式                          | 用途                     |
+| ----------------------------- | ------------------------ |
+| `invalidateQueries(['key'])`  | 強制重新取得             |
+| `removeQueries(['key'])`      | 清除快取                 |
+| `setQueryData(['key'], data)` | 寫入快取資料             |
+| `getQueryData(['key'])`       | 讀取快取資料（不會重抓） |
+
+## 🔁 5. 手動 refetch 資料
+
+```tsx
+const query = useQuery(...)
+query.refetch() // 手動重新取得
+```
+
+搭配：
+
+```tsx
+useQuery({
+  queryKey: ['data'],
+  queryFn,
+  enabled: false, // 預設不抓
+});
+```
+
+## 📦 6. 全域包裝：QueryClientProvider
+
+```tsx
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
+
+<QueryClientProvider client={queryClient}>
+  <App />
+</QueryClientProvider>
+```
+
+> 不包會報錯！每個專案需設一次。
+
+## 🔥 Bonus：開發小技巧
+
+- `refetchInterval: 5000` → 每 5 秒自動更新
+- `retry: 3` → 錯誤最多重試 3 次
+- `onError` / `onSettled` / `onSuccess` → 完整控制流程
+- 可與 Zod + Zustand + 表單整合
+
+## ✅ 最常用 Hook 對照清單
+
+- **`useQuery()`**（hook）：  
+  用來查詢伺服器資料（GET 請求），自動處理 loading/error/data。
+
+- **`useMutation()`**（hook）：  
+  用來送出資料（POST / PUT / DELETE），適合表單送出或刪除操作。
+
+- **`useQueryClient()`**（hook）：  
+  取得 QueryClient 實例，可用來手動操作快取，例如重新抓資料、更新快取內容。
+
+- **`queryClient.invalidateQueries(['key'])`**（函式）：  
+  標記某筆快取為過期，會自動重新取得資料。
+
+- **`queryClient.setQueryData(['key'], data)`**（函式）：  
+  手動設定某筆快取的值（通常用於 optimistic UI）。
+
+- **`queryClient.getQueryData(['key'])`**（函式）：  
+  讀取當前快取內容（不會觸發重抓）。
+
+- **`queryClient.removeQueries(['key'])`**（函式）：  
+  從快取中移除指定的資料。
+
+- **`refetch()`**（函式）：  
+  手動觸發 `useQuery()` 再抓一次資料（例如按下「重新整理」按鈕時）。
+
+- **`<QueryClientProvider client={queryClient}>`**（元件）：  
+  將 React Query 的功能注入整個 App，讓 `useQuery`、`useMutation` 能使用。

@@ -1,0 +1,92 @@
+---
+title: 'Zod #4：Union、Enum、Literal 與 Refine 實戰'
+description: '介紹 Zod 中進階條件型別：union、enum、literal、refine，自定義邏輯與條件驗證。'
+tags: ['zod', 'typescript', 'union', 'enum', 'refine']
+date: '2025-06-17'
+---
+
+# 📘 Zod #4：Union、Enum、Literal 與 Refine 實戰
+
+Zod 支援複雜型別邏輯，包括多種可能值、固定值、列舉、條件轉換與自訂錯誤。這一章會教你四種進階技巧：
+
+## 🔁 union：多種可能型別（二選一、多選一）
+
+```ts
+const schema = z.union([z.string(), z.number()]);
+
+schema.parse('hello'); // ✅ OK
+schema.parse(42); // ✅ OK
+schema.parse(true); // ❌ 錯誤：boolean 不在 union 中
+```
+
+> 📌 也可以用 `.or()` 寫法：`z.string().or(z.number())`
+
+## 🔢 literal：限制某欄位只能是某個固定值
+
+```ts
+const schema = z.literal('admin');
+
+schema.parse('admin'); // ✅
+schema.parse('user'); // ❌ 錯誤
+```
+
+## 🎌 enum：限制值必須是列舉中的其中一個
+
+```ts
+const roleSchema = z.enum(['admin', 'user', 'guest']);
+
+roleSchema.parse('admin'); // ✅
+roleSchema.parse('root'); // ❌ 錯誤
+```
+
+### 🔄 拿 enum 型別當成 TypeScript 類型
+
+```ts
+type Role = z.infer<typeof roleSchema>; // 'admin' | 'user' | 'guest'
+```
+
+## 🧠 refine：加入自定義邏輯驗證
+
+```ts
+const passwordSchema = z
+  .string()
+  .min(6)
+  .refine((val) => /[A-Z]/.test(val), {
+    message: '密碼至少要包含一個大寫英文字母',
+  });
+```
+
+- `.refine(fn, message)`：用來寫任何自訂邏輯
+- `fn` 回傳 true → 驗證成功，false → 失敗
+- message 會回傳錯誤提示
+
+## 🔒 superRefine：可以跨多個欄位自訂邏輯
+
+```ts
+const schema = z
+  .object({
+    password: z.string(),
+    confirm: z.string(),
+  })
+  .superRefine((val, ctx) => {
+    if (val.password !== val.confirm) {
+      ctx.addIssue({
+        path: ['confirm'],
+        message: '兩次密碼不一致',
+        code: z.ZodIssueCode.custom,
+      });
+    }
+  });
+```
+
+> `superRefine()` 適合在 object 中做「跨欄位檢查」
+
+## ✅ 小結
+
+- `union([...])`：允許多種型別
+- `literal('固定值')`：只能是這個值
+- `enum([...])`：列舉中的任一個
+- `refine(fn)`：寫一個欄位的自訂驗證邏輯
+- `superRefine(fn)`：跨欄位驗證，做更複雜邏輯
+
+👉 下一章，我們會學習如何把 Zod schema 與 TypeScript 型別互轉、抽出共用型別！

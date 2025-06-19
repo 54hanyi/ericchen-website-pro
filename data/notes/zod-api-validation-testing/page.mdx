@@ -1,0 +1,90 @@
+---
+title: 'Zod #7：API 驗證與測試實戰'
+description: '介紹如何使用 Zod 在前後端 API 驗證中建立安全的資料入口，並進行單元測試與驗證流程設計。'
+tags: ['zod', 'api', '驗證', '測試']
+date: '2025-06-17'
+---
+
+# 📘 Zod #7：API 驗證與測試實戰
+
+Zod 除了前端表單驗證，也可用於**後端 API 資料驗證、API Route middleware、測試驗證邏輯**，本章將示範：
+
+## ✅ 用 Zod 驗證 API Request 請求內容
+
+例如：你有一個使用者註冊 API，要驗證 req.body 格式：
+
+```ts
+// schema.ts
+import { z } from 'zod';
+
+export const registerSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+});
+```
+
+```ts
+// route.ts (Next.js / Express / Hono 均適用)
+import { registerSchema } from './schema';
+
+app.post('/api/register', async (req, res) => {
+  const parsed = registerSchema.safeParse(req.body);
+
+  if (!parsed.success) {
+    return res.status(400).json({ errors: parsed.error.format() });
+  }
+
+  // 驗證成功，使用 parsed.data
+  const { email, password } = parsed.data;
+  return res.json({ success: true });
+});
+```
+
+## 🧪 對 Schema 撰寫測試
+
+你可以針對 Zod schema 撰寫單元測試，確保驗證邏輯正確：
+
+```ts
+import { registerSchema } from './schema';
+
+describe('registerSchema', () => {
+  it('should pass with valid data', () => {
+    const result = registerSchema.safeParse({
+      email: 'test@example.com',
+      password: 'Abcd1234',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('should fail if email is invalid', () => {
+    const result = registerSchema.safeParse({
+      email: 'bademail',
+      password: 'Abcd1234',
+    });
+    expect(result.success).toBe(false);
+  });
+});
+```
+
+## 💡 驗證 API Query / Params / Headers
+
+Zod 不只能驗證 body，也可驗證：
+
+- `z.string().uuid()`：驗證 `params.id` 是否為 UUID
+- `z.enum(['asc', 'desc'])`：驗證 `query.sort`
+- `z.string().startsWith('Bearer ')`：驗證 headers 的 token 格式
+
+```ts
+const querySchema = z.object({
+  sort: z.enum(['asc', 'desc']).default('asc'),
+});
+```
+
+## ✅ 小結
+
+- Zod 可用於 API request 驗證（body/query/params）
+- 錯誤回傳格式可用 `.format()` 製作友善輸出
+- 可搭配測試工具撰寫單元測試（Jest、Vitest 等）
+- 適合用於前後端共用 schema、集中驗證邏輯
+
+👉 下一章，我們將總結整體應用場景，並介紹 Zod 與其他驗證工具（如 Yup、Joi）的比較。

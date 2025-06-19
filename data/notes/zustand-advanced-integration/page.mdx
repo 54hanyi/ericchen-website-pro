@@ -1,0 +1,139 @@
+---
+title: 'Zustand 進階整合：Middleware 與 React Query 實戰'
+description: '學習如何將 Zustand 搭配 middleware 使用 Devtools 與日誌，並與 React Query 整合以區分伺服器與本地狀態。'
+tags: ['zustand', 'middleware', 'react-query', 'devtools', '整合教學']
+date: '2025-06-17'
+---
+
+# ⚙️ Zustand 進階整合：Middleware 與 React Query 實戰
+
+Zustand 除了可以管理簡單的共享狀態，也可以透過 middleware 與 React Query 搭配，處理更大型應用的需求。
+
+## 🧩 一、Zustand + middleware（Devtools / 日誌）
+
+Zustand 支援 middleware，如 Devtools（偵錯工具）與 logger（日誌追蹤），方便在開發過程中觀察狀態變化。
+
+### 📦 安裝 Devtools
+
+```bash
+npm install zustand zustand/middleware
+```
+
+### ✅ 使用 Devtools middleware
+
+```ts
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+
+type CounterState = {
+  count: number;
+  increase: () => void;
+};
+
+export const useCounterStore = create<CounterState>()(
+  devtools((set) => ({
+    count: 0,
+    increase: () => set((state) => ({ count: state.count + 1 })),
+  }))
+);
+```
+
+- ✅ 這樣在瀏覽器開啟 Redux DevTools 就能觀察狀態變化。
+- 可以設定 `name`：
+
+```ts
+devtools((set) => ({}), { name: 'CounterStore' });
+```
+
+### ✅ 加入 logger middleware（列出每次變動）
+
+```ts
+import { create } from 'zustand';
+import { devtools, logger } from 'zustand/middleware';
+
+export const useStore = create(
+  logger(
+    devtools((set) => ({
+      count: 0,
+      increase: () => set((state) => ({ count: state.count + 1 })),
+    }))
+  )
+);
+```
+
+## 🔁 二、Zustand + React Query 整合
+
+Zustand 與 React Query 可以一起使用，各自負責不同的狀態來源：
+
+✅ 表單欄位、本地 modal、登入狀態
+
+建議工具：Zustand
+
+屬於 Client state（來自 UI、儲存在本地）
+
+✅ API 請求資料（文章列表、用戶資料）
+
+建議工具：React Query
+
+屬於 Server state（來自後端、需要快取與同步）
+
+### ✅ 範例：登入狀態用 Zustand、資料用 React Query
+
+```ts
+// authStore.ts
+import { create } from 'zustand';
+
+export const useAuthStore = create(() => ({
+  isLoggedIn: false,
+  username: '',
+  login: (name: string) => set({ isLoggedIn: true, username: name }),
+  logout: () => set({ isLoggedIn: false, username: '' }),
+}));
+```
+
+```tsx
+// 使用者資訊 + API 清單
+import { useAuthStore } from './authStore';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+
+function UserDashboard() {
+  const { username, isLoggedIn } = useAuthStore();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['posts'],
+    queryFn: () => axios.get('/api/posts').then((res) => res.data),
+    enabled: isLoggedIn, // 登入後才抓
+  });
+
+  if (!isLoggedIn) return <p>請先登入</p>;
+  if (isLoading) return <p>載入中...</p>;
+
+  return (
+    <div>
+      <h2>歡迎回來，{username}</h2>
+      <ul>
+        {data.map((post) => (
+          <li key={post.id}>{post.title}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+## ✅ 小結
+
+🔹 UI 控制、登入狀態、本地 flag
+➤ 屬於：Client state
+➤ 建議工具：Zustand
+
+🔹 伺服器資料、API 資訊
+➤ 屬於：Server state
+➤ 建議工具：React Query
+
+🔹 偵錯 / 日誌監控
+➤ 屬於：middleware
+➤ 建議工具：Devtools / logger
+
+這樣可以達到「狀態分層」、「職責分離」的最佳實務。

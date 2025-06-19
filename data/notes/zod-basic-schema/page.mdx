@@ -1,0 +1,73 @@
+---
+title: 'Zod #1：Zod 是什麼？如何建立基本驗證？'
+description: '介紹 Zod 基本概念、建立 schema、使用 parse/safeParse 驗證物件。'
+tags: ['zod', 'typescript', '表單驗證', 'schema 驗證']
+date: '2025-06-17'
+---
+
+# 📘 Zod #1：Zod 是什麼？如何建立基本驗證？
+
+Zod 是一個用 TypeScript 撰寫的 **schema 驗證函式庫**，用途是用來定義資料結構並進行**靜態型別驗證 + 執行階段資料驗證**。
+
+## ✅ 安裝
+
+```bash
+npm install zod
+```
+
+## 🧠 基本概念：什麼是 schema？
+
+Zod 用「schema」的方式描述資料結構，例如你希望一筆使用者資料長這樣：
+
+```ts
+const userSchema = z.object({
+  name: z.string(),
+  age: z.number(),
+});
+```
+
+這就表示你只接受這樣的資料：
+
+```ts
+{ name: 'Eric', age: 28 } // ✅
+{ name: 'Eric' }          // ❌ age 欄位缺失
+```
+
+## ✨ 基本驗證：`parse()` vs `safeParse()`
+
+```ts
+import { z } from 'zod';
+
+const userSchema = z.object({
+  name: z.string(),
+  age: z.number(),
+});
+
+// parse：錯誤會 throw 出來（建議開發測試用）
+const data = userSchema.parse({ name: 'Eric', age: 20 });
+
+// safeParse：不會 throw，而是回傳 success / error（建議實務使用）
+const result = userSchema.safeParse({ name: 'Eric' });
+
+if (!result.success) {
+  console.log(result.error.format()); // 可讀錯誤訊息
+}
+```
+
+## 🧪 常見型別建立方式
+
+```ts
+z.string()            // 字串
+z.number()            // 數字
+z.boolean()           // 布林值
+z.date()              // 日期物件
+z.array(z.string())   // 陣列（每個都是 string）
+z.object({ ... })     // 物件
+```
+
+## ✅ 小結
+
+- Zod 是一個適用於 TypeScript 的驗證函式庫
+- 使用 `z.object({...})` 建立 schema
+- 使用 `.parse()` 驗證資料（錯誤會 throw）
+- 使用 `.safeParse()` 安全驗證（回傳 success / error）
